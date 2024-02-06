@@ -1,0 +1,22 @@
+name: Code Review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    branches: [ develop ]
+    types: [opened, reopened, synchronize]
+
+jobs:
+  ChatGPT-CodeReview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anc95/ChatGPT-CodeReview@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_ENDPOINT: https://proxypass5.996dev.icu/v1
+          MODEL: gpt-3.5-turbo-1106
+          LANGUAGE: Chinese

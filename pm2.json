@@ -1,0 +1,14 @@
+{
+  "apps": [
+    {
+      "name": "demo-api",
+      "script": "./api/app.js",
+      "instances": 0
+    },
+    {
+      "name": "demo-consumer",
+      "script": "./consumer/app.js",
+      "instances": 0
+    }
+  ]
+}
