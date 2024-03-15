@@ -11,6 +11,15 @@ class BizTokenScf extends ScfClient {
       param: null,
     })
   }
+
+  getFeiShuTenantAccessToken(): Promise<string> {
+    return this.callFunction({
+      moduleName: 'core',
+      serviceName: 'token',
+      funcName: 'getFeiShuTenantAccessToken',
+      param: null,
+    })
+  }
 }
 
 const bizTokenScf = new BizTokenScf()

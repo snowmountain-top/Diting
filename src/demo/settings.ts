@@ -6,6 +6,7 @@ import path from 'path'
 const env = process.env
 
 const envConfig = {
+  PROJECT_NAME: 'CloudContainerDemo',
   NODE_ENV: env.NODE_ENV || 'development',
   API_PORT: Number(env.API_PORT) || 8090,
   CONSUMER_PORT: Number(env.CONSUMER_PORT) || 8090,

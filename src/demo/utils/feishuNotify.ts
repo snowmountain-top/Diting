@@ -1,9 +1,11 @@
 import { Response, Request } from 'express'
 import envUtils from './env'
+import envConfig from '../settings'
 import axios, { AxiosError } from 'axios'
 import getLogger from './logger'
 import { format } from 'date-fns'
 import * as rTracer from 'cls-rtracer'
+import bizTokenScf from '../vendors/bizTokenScf'
 
 const _LOGGER = getLogger()
 
@@ -77,9 +79,59 @@ class FeishuNotify {
 **【body】**: ${JSON.stringify(request.body)}
 **【traceId】**: ${rTracer.id()}
 **【stack】**:
- ${err.stack ? JSON.stringify(err.stack).slice(0, 500) : '无堆栈信息'}`
+${err.stack || '无堆栈信息'}`
 
-    this.sendMessage(msgContent, { value: 'Demo 告警', color: 'red' })
+    this.sendMessage(msgContent, { value: `${envConfig.PROJECT_NAME} 告警`, color: 'red' })
+    this.insertAlertTable(err, request)
+  }
+
+  buildExceptionTableData(
+    err: Error,
+    request: Request,
+  ): {
+    datetime: number
+    platform: string
+    traceId: string
+    module: string
+    stack: string
+    param: string
+  } {
+    return {
+      datetime: Date.now(),
+      platform: envConfig.PROJECT_NAME,
+      traceId: rTracer.id() as string,
+      module: request.path,
+      stack: err.stack ? err.stack : '无堆栈信息',
+      param: JSON.stringify(request.body),
+    }
+  }
+
+  async insertAlertTable(err: Error, request: Request) {
+    const data = this.buildExceptionTableData(err, request)
+    const feishuToken = await bizTokenScf.getFeiShuTenantAccessToken()
+    const tableId = 'tbls4peoVEtZKoYP'
+    const objToken = 'bascnYdu7oAJZ1Rg0f42pondjZg'
+    try {
+      await axios({
+        url: `https://open.feishu.cn/open-apis/bitable/v1/apps/${objToken}/tables/${tableId}/records`,
+        method: 'post',
+        data: {
+          fields: data,
+        },
+        headers: {
+          Authorization: 'Bearer ' + feishuToken,
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        responseType: 'json',
+      })
+    } catch (err) {
+      const errData = {
+        message: '飞书告警表插入失败',
+        stack: err.stack,
+        responseData: err.response?.data,
+      }
+      _LOGGER.error(errData)
+    }
   }
 
   /** 手动告警 */
