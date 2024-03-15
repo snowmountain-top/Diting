@@ -107,6 +107,7 @@ ${err.stack || '无堆栈信息'}`
   }
 
   async insertAlertTable(err: Error, request: Request) {
+    if (!envUtils.isProduction()) return
     const data = this.buildExceptionTableData(err, request)
     const feishuToken = await bizTokenScf.getFeiShuTenantAccessToken()
     const tableId = 'tbls4peoVEtZKoYP'
