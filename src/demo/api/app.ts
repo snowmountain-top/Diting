@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import rTracer from 'cls-rtracer'
 import envConfig from '../settings'
 import * as remoteConfig from '../utils/remoteConfig'
+import cors from 'cors'
 
 // 堆栈信息转换
 import * as sourceMapSupport from 'source-map-support'
@@ -33,6 +34,9 @@ async function main() {
   await remoteConfig.register()
 
   const app = express()
+
+  // 跨域
+  app.use(cors())
 
   // 使用rTracer，为了在请求链路中生成追踪Id
   app.use(rTracer.expressMiddleware({ useHeader: true, headerName: 'X-Request-Id' }))
