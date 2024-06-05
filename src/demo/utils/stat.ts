@@ -18,7 +18,7 @@ interface StatData {
  */
 export class StatUtil {
   private readonly domain: string = 'demo'
-  private logger = null
+  private logger: ReturnType<typeof getLogger>
 
   constructor() {
     // init logger

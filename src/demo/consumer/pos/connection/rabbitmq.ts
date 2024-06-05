@@ -1,18 +1,20 @@
 import amqp from 'amqp-connection-manager'
 import { ConfirmChannel } from 'amqplib'
-
 import mqConfig, { ConsumeQueues } from '../config'
 
-export function createChannelWithTopic(queue: ConsumeQueues) {
-  const connection = amqp.connect([
-    {
-      hostname: mqConfig.RABBITMQ_HOST,
-      port: mqConfig.RABBITMQ_PORT,
-      username: mqConfig.RABBITMQ_USERNAME,
-      password: mqConfig.RABBITMQ_PASSWORD,
-      vhost: mqConfig.RABBITMQ_VHOST,
-    },
-  ])
+export type TopicType = 'direct' | 'fanout' | 'topic' | 'headers'
+
+export function createChannelWithTopic(
+  queue: ConsumeQueues,
+  config: {
+    hostname: string
+    port: number
+    username: string
+    password: string
+    vhost: string
+  },
+) {
+  const connection = amqp.connect([config])
   connection.on('connect', function () {
     console.info('[AmqpConnectionManager]连接成功')
   })
@@ -33,8 +35,8 @@ export function createChannelWithTopic(queue: ConsumeQueues) {
       }
       return Promise.all([
         channel.assertExchange(mqConfig.sourceExchange, 'topic', { durable: true }),
-        mqConfig.sourceRoutingKeys.map((routingKey) =>
-          channel.bindExchange(mqConfig.sourceExchange, mqConfig.sourceExchange, routingKey),
+        mqConfig.previousRoutingKeys.map((routingKey) =>
+          channel.bindExchange(mqConfig.sourceExchange, mqConfig.previousExchange, routingKey),
         ),
         channel.assertQueue(queue, { durable: true }),
         matchRoutingKeys.map((routingKey) =>

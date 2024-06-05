@@ -26,4 +26,4 @@ COPY --from=build /webapp/demo/dist /webapp/demo
 COPY --from=build /webapp/demo/src/demo/resources /webapp/demo/resources
 WORKDIR /webapp/demo
 EXPOSE 8090
-CMD npx pm2-runtime start pm2.json --only demo-api --output stdout
+CMD npx pm2-runtime start pm2.json --output stdout

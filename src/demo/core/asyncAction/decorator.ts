@@ -1,9 +1,10 @@
+import envConfig from '../../settings'
 import feishuNotifyInstance, { FeishuGroup } from '../../utils/feishuNotify'
 import getLogger from '../../utils/logger'
 import { MQProducer } from '../connection/mqProducer'
 const LOGGER = getLogger()
 
-const asyncProducer = new MQProducer('async-task')
+let asyncProducer: MQProducer = null
 
 export function AsyncClass() {
   return function (constructor: Function) {
@@ -16,6 +17,7 @@ export function AsyncClass() {
       if (propertyName !== 'constructor' && typeof prototype[propertyName] === 'function') {
         const originalMethod = prototype[propertyName]
         prototype[propertyName] = async function (...args: any[]) {
+          if (!asyncProducer) asyncProducer = new MQProducer(envConfig.ASYNC_TASK_TOPIC)
           // 消费者消费时，最后一个参数是一个对象，用来标识是否消费场景
           const lastParam = args[args.length - 1]
           if (typeof lastParam === 'object' && lastParam.consumeSwitch)
@@ -26,7 +28,7 @@ export function AsyncClass() {
               params: args,
               method: originalMethod.name,
             }
-            await asyncProducer.publish(content, 'async-task')
+            await asyncProducer.publish(content, envConfig.ASYNC_TASK_ROUTING_KEY)
             LOGGER.info(`异步任务投递成功: ${JSON.stringify(content)}`)
           } catch (e) {
             const err = {

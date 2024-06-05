@@ -2,7 +2,8 @@ import { v4 as uuidV4 } from 'uuid'
 import amqp, { ChannelWrapper } from 'amqp-connection-manager'
 import { ConfirmChannel } from 'amqplib'
 import getLogger from '../../utils/logger'
-import envConfig from '../../settings'
+import globalEnvConfig, { CacheConfig } from '../../settings'
+import * as memoryCache from 'memory-cache'
 
 const _LOGGER = getLogger()
 
@@ -14,13 +15,14 @@ export class MQProducer {
 
   constructor(topic: string, topicType: TopicType = 'topic') {
     this.topic = topic
+    const cacheConfig: CacheConfig = memoryCache.get(globalEnvConfig.CONFIGURATION_KEY)
     const connection = amqp.connect([
       {
-        hostname: envConfig.RABBITMQ_HOST,
-        port: envConfig.RABBITMQ_PORT,
-        username: envConfig.RABBITMQ_USERNAME,
-        password: envConfig.RABBITMQ_PASSWORD,
-        vhost: envConfig.RABBITMQ_VHOST,
+        hostname: cacheConfig.newRabbitMqDatabase.RABBITMQ_HOST,
+        port: Number(cacheConfig.newRabbitMqDatabase.RABBITMQ_PORT),
+        username: cacheConfig.newRabbitMqDatabase.RABBITMQ_USERNAME,
+        password: cacheConfig.newRabbitMqDatabase.RABBITMQ_PASSWORD,
+        vhost: globalEnvConfig.RABBITMQ_VHOST,
       },
     ])
 

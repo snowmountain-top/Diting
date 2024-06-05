@@ -1,5 +1,5 @@
 import { Controller, CustomerRequest } from '../../types'
-import demoService from './service'
+import demoService from '../../core/modules/demo/service'
 
 class DemoController implements Controller.DemoController.Main {
   async demoFunc(

@@ -1,5 +1,5 @@
 import { Redis } from 'ioredis'
-import { getRedisInstance } from '../core/connection/redis'
+import redisInstance from '../core/connection/redis'
 import stringUtils from '@be-link/common-sdk/utils/string'
 import getLogger from './logger'
 
@@ -14,7 +14,7 @@ interface IRedisLockConfig {
 
 export default class RedisLock {
   private static defaultConfig = {
-    client: getRedisInstance(),
+    client: redisInstance,
     lockValueLen: 10,
     lockExpire: 5,
   }

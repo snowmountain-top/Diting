@@ -11,10 +11,24 @@ import * as sourceMapSupport from 'source-map-support'
 import { logResponseRes, errorLogger } from './middleware/logger'
 import demoApplicationRouter from './routes/demoApplication'
 import { injectUserInfo } from './middleware/injectUserInfo'
+import * as databaseService from '../core/connection/database'
+import * as cosService from '../utils/cos'
+import * as memoryCache from 'memory-cache'
+import * as redisService from '../core/connection/redis'
+import demoControllerRouter from './routes/demoController'
+import { authMiddleware } from './middleware/auth'
 
 sourceMapSupport.install()
 
 async function main() {
+  const cosInfo = await cosService.getObject(envConfig.CONFIGURATION_KEY)
+  // 将对象放入内存缓存中
+  if (cosInfo) memoryCache.put(envConfig.CONFIGURATION_KEY, cosInfo)
+
+  // 启动时初始化数据源
+  await databaseService.init()
+  await redisService.setRedisInstance()
+
   // 启动远程配置模块
   await remoteConfig.register()
 
@@ -36,7 +50,8 @@ async function main() {
   app.use(injectUserInfo())
 
   // 路由 - demo
-  app.use('/demo', demoApplicationRouter)
+  app.use('/demo', authMiddleware, demoApplicationRouter)
+  app.use('/test', authMiddleware, demoControllerRouter)
 
   app.get('/', async function (req: Request, res: Response) {
     res.json({ message: 'Hello World' })

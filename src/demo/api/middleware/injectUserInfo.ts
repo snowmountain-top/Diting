@@ -1,6 +1,6 @@
 import express from 'express'
 import requestHandler from '../../utils/requestHandler'
-import { CustomerRequest } from '../../core/types'
+import { CustomerRequest } from '../../types'
 
 // 全局异常处理
 export function injectUserInfo() {

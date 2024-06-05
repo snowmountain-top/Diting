@@ -1,7 +1,6 @@
-import { MQConsumer } from '../consumer'
+import { MQConsumer } from './consumer'
 import { ConsumeQueues, MessagePayLoad } from './config'
 import getLogger from '../../utils/logger'
-import { createChannelWithTopic } from './connection/rabbitmq'
 
 const LOGGER = getLogger()
 
@@ -15,7 +14,7 @@ abstract class QueueConsumer {
 
   // 启动消费者
   startConsumer() {
-    const consumer = new MQConsumer(this.queue, createChannelWithTopic)
+    const consumer = new MQConsumer(this.queue)
     console.info(`消费者启动，queue：${this.queue}`)
     consumer.consume(async (payload: MessagePayLoad, header?: any) => {
       await this.exec(payload, header)
@@ -27,16 +26,13 @@ abstract class QueueConsumer {
   }
 }
 
-// 队列具体的消费逻辑，继承QueueConsumer，实现exec方法，跟Queue一一对应
-class DemoConsumeFunction extends QueueConsumer {
+class DemoHandleFunction extends QueueConsumer {
   constructor() {
-    super(ConsumeQueues.DEMO_CONSUME_FUNCTION)
+    super(ConsumeQueues.DEMO_HANDLE_FUNCTION)
   }
 
-  async exec(payload: MessagePayLoad, header?: any): Promise<void> {
-    console.info('消费消息：', payload)
-  }
+  async exec(payload: MessagePayLoad) {}
 }
 
-const TargetSourceConsumerClassList = [DemoConsumeFunction]
-export default TargetSourceConsumerClassList
+const DemoConsumerClassList = [DemoHandleFunction]
+export default DemoConsumerClassList
