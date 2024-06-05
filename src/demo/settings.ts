@@ -82,8 +82,8 @@ const envConfig = {
   // 工程根路径(demo目录)
   ROOT_PATH: path.resolve(__dirname),
   // tencent
-  TENCENT_SECRET_ID: env.TENCENT_SECRET_ID || 'AKIDzw0tjuPbbhfPvDO2TgGk00mTUEfjkp0v',
-  TENCENT_SECRET_KEY: env.TENCENT_SECRET_KEY || 'xtjX6xZv4QE4lKNK44qyDFacq9MExW0f',
+  TENCENT_SECRET_ID: env.TENCENT_SECRET_ID || '*****',
+  TENCENT_SECRET_KEY: env.TENCENT_SECRET_KEY || '****',
   // 云函数
   SCF_ENV_DEV: 'dev-1gpp53ju3ceb46c7',
   SCF_ENV_RELEASE: 'release-7gvojkxi667a3f26',
