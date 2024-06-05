@@ -1,7 +1,7 @@
 import { ConsumeQueues, MessagePayLoad } from './config'
 import getLogger from '../../utils/logger'
 import { createChannelWithTopic } from './connection/rabbitmq'
-import { MQConsumer } from '../consumer'
+import { MQConsumer } from './consumer'
 import asyncAction from '../../core/asyncAction/index'
 const LOGGER = getLogger()
 
@@ -30,7 +30,7 @@ class QueueConsumer {
 class AsyncTaskConsumeFunction extends QueueConsumer {
   private consumeSwitch = true
   constructor() {
-    super(ConsumeQueues.ASYNC_TASK_CONSUME)
+    super(ConsumeQueues.ASYNC_TASK_QUEUE)
   }
 
   exec(payload: MessagePayLoad, header?: any): Promise<void> {

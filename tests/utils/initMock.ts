@@ -7,7 +7,8 @@
 import { DataSource } from 'typeorm'
 import fs from 'fs'
 import path from 'path'
-import * as posClient from '@be-link/pos-cli-nodejs'
+import * as rosClient from '@be-link/ros-cli-nodejs'
+import * as userClient from '@be-link/user-cli-nodejs'
 import * as redisClient from '../../src/demo/core/connection/redis'
 import * as logger from '../../src/demo/utils/logger'
 import Redis from 'ioredis-mock'
@@ -63,45 +64,35 @@ class DbMock extends MockInit {
   alias: string = 'getBeLinkDataSource'
 
   mock() {
-    /** 初始化数据源 */
-    async function initDataSource(dataSource: DataSource) {
-      if (dataSource.isInitialized) return
-      await dataSource.initialize()
-    }
     this.mockObj = jest.fn(async () => {
-      await initDataSource(this.dataSource)
+      if (!this.dataSource.isInitialized) {
+        await this.dataSource.initialize()
+        await this.dataSource.query('PRAGMA foreign_keys=OFF')
+      }
       return this.dataSource
     })
     return this.mockObj
   }
 
-  clear(): void {
-    this.dataSource = new DataSource({
-      type: 'sqlite',
-      database: ':memory:',
-      entities: [path.join(__dirname, '../../src/demo/core/entity/**/*')],
-      logging: ['error'],
-      logger: 'advanced-console',
-      synchronize: true,
-    })
-  }
+  clear(): void {}
 }
 const dbMock = new DbMock()
 mockMap[dbMock.alias] = dbMock
 
-/** POS Mock */
-class PosClientMock extends MockInit {
-  dependencePath: string = path.join(__dirname, '../../node_modules/@be-link/pos-cli-nodejs')
+/** ROS Mock */
+class RosClientMock extends MockInit {
+  dependencePath: string = path.join(__dirname, '../../node_modules/@be-link/ros-cli-nodejs')
 
   alias: string = 'rosClient'
 
   protected proxyMap = {
-    queryByWebService: createMockProxy(posClient.queryByWebService, 'queryByWebService'),
+    rosProcessService: createMockProxy(rosClient.rosProcessService, 'rosProcessService'),
+    rosQueryService: createMockProxy(rosClient.rosQueryService, 'rosQueryService'),
   }
 
   mock() {
     const proxyMap = this.proxyMap
-    this.mockObj = new Proxy(posClient, {
+    this.mockObj = new Proxy(rosClient, {
       get(target, key) {
         if (Object.keys(proxyMap).includes(String(key))) return proxyMap[key]
         return Reflect.get(target, key)
@@ -116,8 +107,40 @@ class PosClientMock extends MockInit {
     }
   }
 }
-const posClientMock = new PosClientMock()
-mockMap[posClientMock.alias] = posClientMock
+const rosClientMock = new RosClientMock()
+mockMap[rosClientMock.alias] = rosClientMock
+
+/** User Mock */
+class UserClientMock extends MockInit {
+  dependencePath: string = path.join(__dirname, '../../node_modules/@be-link/user-cli-nodejs')
+
+  alias: string = 'userClient'
+
+  protected proxyMap = {
+    userService: createMockProxy(userClient.userService, 'userService'),
+    creditService: createMockProxy(userClient.creditService, 'creditService'),
+    userBdService: createMockProxy(userClient.userBdService, 'userBdService'),
+  }
+
+  mock() {
+    const proxyMap = this.proxyMap
+    this.mockObj = new Proxy(userClient, {
+      get(target, key) {
+        if (Object.keys(proxyMap).includes(String(key))) return proxyMap[key]
+        return Reflect.get(target, key)
+      },
+    })
+    return this.mockObj
+  }
+
+  clear(): void {
+    for (const proxyKey in this.proxyMap) {
+      delete this.proxyMap[proxyKey].mockMap
+    }
+  }
+}
+const userClientMock = new UserClientMock()
+mockMap[userClientMock.alias] = userClientMock
 
 /** redis Mock */
 class RedisClientMock extends MockInit {
@@ -145,7 +168,10 @@ mockMap[redisClientMock.alias] = redisClientMock
 
 /** rabbit channel Mock */
 class RabbitChannelMock extends MockInit {
-  dependencePath: string = path.join(__dirname, '../../src/demo/asyncTask/connection/rabbitmq.ts')
+  dependencePath: string = path.join(
+    __dirname,
+    '../../src/demo/consumer/asyncTask/connection/rabbitmq.ts',
+  )
 
   alias: string = 'createChannelWithTopic'
 
@@ -172,7 +198,8 @@ class LoggerMock extends MockInit {
     private composeContext(content: { [key: string]: any } | string): {
       [key: string]: any
     } {
-      let context: any = null
+      // @ts-ignore
+      let context: { [key: string]: any } = null
       if (typeof content === 'string') {
         context = {
           message: content,

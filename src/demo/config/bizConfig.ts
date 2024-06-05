@@ -1,3 +1,5 @@
+import { configInstance } from '../utils/remoteConfig'
+
 class BizConfig {
   get demoConfig() {
     return {

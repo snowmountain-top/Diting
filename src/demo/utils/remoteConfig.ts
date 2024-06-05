@@ -1,6 +1,4 @@
-import { getRedisInstance } from '../core/connection/redis'
-
-const redisInstance = getRedisInstance()
+import redisInstance from '../core/connection/redis'
 
 /**
  * 获取远程数据的时间间隔 (秒)
@@ -11,13 +9,13 @@ class LocalCache {
   /**
    * 远端(redis)数据在本地的内存缓存
    */
-  _localCache: { [key: string]: string }
+  _localCache: { [key: string]: any }
 
   constructor() {
     this._localCache = {}
   }
 
-  async fetch() {
+  async fetch(): Promise<{ [key: string]: any }> {
     throw new Error('Not implement')
   }
 }
@@ -55,10 +53,11 @@ class Switch extends LocalCache {
     return this.isSwitchOn('stopSms')
   }
 
-  async fetch(): Promise<void> {
+  async fetch() {
     const remoteData = await redisInstance.hgetall(this._remoteDataKey)
     // 重置本地缓存
     this._localCache = Object.assign({}, remoteData)
+    return this._localCache
   }
 }
 
@@ -71,8 +70,9 @@ class Config extends LocalCache {
    */
   _remoteDataKey = 'demo:config:features'
 
-  constructor() {
+  constructor(key?: string) {
     super()
+    if (key) this._remoteDataKey = key
   }
 
   /**
@@ -84,7 +84,7 @@ class Config extends LocalCache {
     return result === undefined ? defaultValue : result
   }
 
-  async fetch(): Promise<void> {
+  async fetch() {
     const remoteData = await redisInstance.hgetall(this._remoteDataKey)
     // 对配置数据做JSON反序列化
     this._localCache = {}
@@ -96,6 +96,7 @@ class Config extends LocalCache {
         this._localCache[key] = remoteData[key]
       }
     }
+    return this._localCache
   }
 }
 
@@ -116,15 +117,26 @@ process.on('uncaughtException', clearTimer)
  */
 export const switchInstance = new Switch()
 export const configInstance = new Config()
+export const globalConfigInstance = new Config('global:feature:config')
 
+// 仅需在服务启动时调用一次, 无需调用多次
 // 仅需在服务启动时调用一次, 无需调用多次
 export async function register() {
   if (!timer) {
     timer = setInterval(function () {
       switchInstance.fetch()
       configInstance.fetch()
+      globalConfigInstance.fetch().then((res) => {
+        process.env.authorizationTokenInside = res.tokenKey
+      })
     }, 1000 * FETCH_INTERVAL_SECONDS)
   }
-  await Promise.all([switchInstance.fetch(), configInstance.fetch()])
+  await Promise.all([
+    switchInstance.fetch(),
+    configInstance.fetch(),
+    globalConfigInstance.fetch().then((res) => {
+      process.env.authorizationTokenInside = res.tokenKey
+    }),
+  ])
   console.info('远程配置模块加载成功')
 }

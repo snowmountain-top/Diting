@@ -5,48 +5,94 @@ import path from 'path'
 
 const env = process.env
 
+export type CacheConfig = {
+  JWT_SECRET: string
+  DECRYPT_DATA_SECRET: string
+  databaseMaster: {
+    database: string
+    host: string
+    port: number
+    user: string
+    password: string
+  }
+  databaseSlave: {
+    database: string
+    host: string
+    port: number
+    user: string
+    password: string
+  }
+  redisDatabase: {
+    host: string
+    port: number
+    password: string
+  }
+  rabbitMqDatabase: {
+    RABBITMQ_HOST: string
+    RABBITMQ_PORT: number
+    RABBITMQ_USERNAME: string
+    RABBITMQ_PASSWORD: string
+    RABBITMQ_VHOST: string
+  }
+  newRabbitMqDatabase: {
+    RABBITMQ_HOST: string
+    RABBITMQ_PORT: number
+    RABBITMQ_USERNAME: string
+    RABBITMQ_PASSWORD: string
+    RABBITMQ_VHOST: string
+  }
+  wxSecretInfo: {
+    TENCENT_SECRET_ID: string
+    TENCENT_SECRET_KEY: string
+    WEPAY_MERCHANT_ID: string
+    WEPAY_MERCHANT_CERT_SERIAL_CODE: string
+    WEPAY_PLATFORM_CERT_SERIAL_CODE: string
+    WEPAY_API_V3_SECRET: string
+    WEPAY_APPID: string
+    TEMP_ACTIVITY_TEMPLATE_ID: string
+    NEW_YEAR_ACTIVITY_TEMPLATE_ID: string
+    YEEPAY_MERCHANT_NO: string
+    YEEPAY_APP_KEY: string
+    APICLIENT_KEY: string
+    WEPAY_PLATFORM_CERT: string
+    YEEPAY_PLATFORM_PRIVATE_KEY: string
+    YEEPAY_PLATFORM_PUBLIC_KEY: string
+    appId: string
+  }
+}
+
 const envConfig = {
-  PROJECT_NAME: 'CloudContainerDemo',
+  PROJECT_NAME: 'DEMO',
   NODE_ENV: env.NODE_ENV || 'development',
   API_PORT: Number(env.API_PORT) || 8090,
   CONSUMER_PORT: Number(env.CONSUMER_PORT) || 8090,
   BASE_URL_DEV: '',
   BASE_URL_RELEASE: '',
+  CONFIGURATION_KEY: env.CONFIGURATION_KEY || 'configuration_detail',
   // mysql
-  MYSQL_HOST: env.MYSQL_HOST || 'sh-cynosdbmysql-grp-bzfpohys.sql.tencentcdb.com',
-  MYSQL_PORT: Number(env.MYSQL_PORT) || 27428,
-  MYSQL_USER_NAME: env.MYSQL_USER_NAME || 'root',
-  MYSQL_PASSWORD: env.MYSQL_PASSWORD || 'Admin12345678',
   MYSQL_POOL_MAX: Number(env.MYSQL_POOL_MAX) || 5,
   MYSQL_DB: env.MYSQL_DB || 'be_link',
   // mysql从库
-  MYSQL_HOST_SLAVE: env.MYSQL_HOST_SLAVE || '10.1.0.43',
-  MYSQL_PORT_SLAVE: Number(env.MYSQL_PORT_SLAVE) || 3306,
-  MYSQL_USER_NAME_SLAVE: env.MYSQL_USER_NAME_SLAVE || 'belink',
-  MYSQL_PASSWORD_SLAVE: env.MYSQL_PASSWORD_SLAVE || 'O!HllY5C$eG6bu*n',
   MYSQL_POOL_MAX_SLAVE: Number(env.MYSQL_POOL_MAX_SLAVE) || 5,
   MYSQL_DB_SLAVE: env.MYSQL_DB_SLAVE || 'be_link',
   // redis
-  REDIS_HOST: env.REDIS_HOST || 'sh-crs-bskdu4sh.sql.tencentcdb.com',
-  REDIS_PORT: Number(env.REDIS_PORT) || 27959,
-  REDIS_PASSWORD: env.REDIS_PASSWORD || 'admin12345678',
   REDIS_DB: Number(env.REDIS_DB) || 0,
   // RabbitMQ
-  RABBITMQ_HOST: env.RABBITMQ_HOST || '175.24.251.2',
-  RABBITMQ_PORT: Number(env.RABBITMQ_PORT) || 5672,
-  RABBITMQ_USERNAME: env.RABBITMQ_USERNAME || 'admin',
-  RABBITMQ_PASSWORD: env.RABBITMQ_PASSWORD || 'PrqvdkhGb3Tbeza2',
-  RABBITMQ_VHOST: env.RABBITMQ_VHOST || 'demo',
+  RABBITMQ_VHOST: env.RABBITMQ_VHOST || 'trade',
+  // 工程根路径(demo目录)
+  ROOT_PATH: path.resolve(__dirname),
   // tencent
   TENCENT_SECRET_ID: env.TENCENT_SECRET_ID || 'AKIDzw0tjuPbbhfPvDO2TgGk00mTUEfjkp0v',
   TENCENT_SECRET_KEY: env.TENCENT_SECRET_KEY || 'xtjX6xZv4QE4lKNK44qyDFacq9MExW0f',
   // 云函数
   SCF_ENV_DEV: 'dev-1gpp53ju3ceb46c7',
   SCF_ENV_RELEASE: 'release-7gvojkxi667a3f26',
-  // 工程根路径(demo目录)
-  ROOT_PATH: path.resolve(__dirname),
-  // 小程序Id
-  MINI_APPID: env.MINI_APPID,
+  // ip
+  IP_RELEASE: '124.221.197.247',
+  IP_DEV: '101.34.70.145',
+  // 异步任务
+  ASYNC_TASK_TOPIC: 'demo-async-task',
+  ASYNC_TASK_ROUTING_KEY: 'async-task',
 }
 
 export default envConfig

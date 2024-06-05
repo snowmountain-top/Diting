@@ -1,5 +1,5 @@
 import { Request as ExpressRequest } from 'express'
-import { CustomerRequest } from '../types'
+import { CustomerRequest } from '../../types'
 
 export namespace Application {
   export namespace Demo {

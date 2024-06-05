@@ -1,27 +1,42 @@
 import { ConfirmChannel, Message } from 'amqplib'
-import getLogger from '../utils/logger'
-import feishuNotifyInstance, { FeishuGroup } from '../utils/feishuNotify'
-import envUtils from '../utils/env'
-import consumerAsyncLocalStorage from '../utils/consumerAsyncLocalStorage'
+import { createChannelWithTopic } from './connection/rabbitmq'
+import getLogger from '../../utils/logger'
+import feishuNotifyInstance, { FeishuGroup } from '../../utils/feishuNotify'
+import envUtils from '../../utils/env'
+import mqConfig, { ConsumeQueues } from './config'
+import consumerAsyncLocalStorage from '../../utils/consumerAsyncLocalStorage'
+
+import * as memoryCache from 'memory-cache'
+import globalEnvConfig, { CacheConfig } from '../../settings'
 
 const LOGGER = getLogger()
-export class MQConsumer<T extends string> {
-  private queue: T
-  private channelWrapper: any
+export class MQConsumer {
+  private queue: string
+  // 降配后的队列
+  private newChannelWrapper: any
   private retryQueue: string
   private retryExchange: string
 
-  constructor(queue: T, createChannelFunction: Function) {
+  constructor(queue: ConsumeQueues) {
+    const cacheConfig: CacheConfig = memoryCache.get(globalEnvConfig.CONFIGURATION_KEY)
     this.queue = queue
     this.retryQueue = queue + '-retry'
     this.retryExchange = queue + '-retry'
-    this.channelWrapper = createChannelFunction(queue)
+    // 降配后的队列
+    this.newChannelWrapper = createChannelWithTopic(queue, {
+      hostname: cacheConfig.newRabbitMqDatabase.RABBITMQ_HOST,
+      port: Number(cacheConfig.newRabbitMqDatabase.RABBITMQ_PORT),
+      username: cacheConfig.newRabbitMqDatabase.RABBITMQ_USERNAME,
+      password: cacheConfig.newRabbitMqDatabase.RABBITMQ_PASSWORD,
+      vhost: mqConfig.RABBITMQ_VHOST,
+    })
   }
 
   public async consume(callback: Function) {
     const ttl = envUtils.isProduction() ? 60000 : 6000
 
-    this.channelWrapper.addSetup((channel: ConfirmChannel) => {
+    // 降配后的队列
+    this.newChannelWrapper.addSetup((channel: ConfirmChannel) => {
       return Promise.all([
         // 声明原始队列
         channel.assertQueue(this.queue, { durable: true }),

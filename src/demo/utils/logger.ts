@@ -43,7 +43,7 @@ class Logger {
   private composeContext(content: { [key: string]: any } | string): {
     [key: string]: any
   } {
-    let context = null
+    let context: { [key: string]: any } = null
     if (typeof content === 'string') {
       context = {
         message: content,

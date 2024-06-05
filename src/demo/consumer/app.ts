@@ -1,37 +1,37 @@
 require('express-async-errors')
-import express from 'express'
 import envConfig from '../settings'
-import rTracer from 'cls-rtracer'
 
 // 堆栈信息转换
 import * as sourceMapSupport from 'source-map-support'
 sourceMapSupport.install()
 
-// 启动远程配置模块
 import * as remoteConfig from '../utils/remoteConfig'
-remoteConfig.register()
+import * as databaseService from '../core/connection/database'
+import * as cosService from '../utils/cos'
+import * as memoryCache from 'memory-cache'
+import * as redisService from '../core/connection/redis'
 
-import TargetSourceConsumerClassList from './demoSourceConsumer'
 import AsyncActionConsumerClassList from './asyncTask'
+import DemoConsumerClassList from './pos'
 
-const TotalConsumeClassList = [...TargetSourceConsumerClassList, ...AsyncActionConsumerClassList]
+const TotalConsumeClassList = [...AsyncActionConsumerClassList, ...DemoConsumerClassList]
 
-for (const ConsumerClass of TotalConsumeClassList) {
-  const consumer = new ConsumerClass()
-  consumer.startConsumer()
+async function init() {
+  const cosInfo = await cosService.getObject(envConfig.CONFIGURATION_KEY)
+  // 将对象放入内存缓存中
+  if (cosInfo) memoryCache.put(envConfig.CONFIGURATION_KEY, cosInfo)
+
+  // 启动时初始化数据源
+  await databaseService.init()
+  await redisService.setRedisInstance()
+  // 启动远程配置模块
+  await remoteConfig.register()
+
+  // 启动消费者
+  for (const ConsumerClass of TotalConsumeClassList) {
+    const consumer = new ConsumerClass()
+    consumer.startConsumer()
+  }
 }
 
-// =============================== 启动心跳检查服务 =================================
-
-const heartbeatApp = express()
-
-// 使用rTracer，为了在请求链路中生成追踪Id
-heartbeatApp.use(rTracer.expressMiddleware({ useHeader: true, headerName: 'X-Request-Id' }))
-
-heartbeatApp.get('/', (req, res) => {
-  res.status(200).send('OK')
-})
-
-heartbeatApp.listen(envConfig.CONSUMER_PORT, () => {
-  console.info(`Heartbeat Server is running on port ${envConfig.CONSUMER_PORT}`)
-})
+init()

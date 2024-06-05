@@ -1,15 +1,5 @@
-import { Router } from 'express'
-import { transfer } from '../middleware/router'
-import processController from '../../core/application/demo'
+import processController from '../application/demo'
+import CustomerRouter from './CustomerRouter'
 
-const demoApplicationRouter = Router()
-
-const funcNameList = Reflect.ownKeys(processController.constructor.prototype).filter(
-  (item) => item !== 'constructor',
-)
-
-for (const funcName of funcNameList) {
-  demoApplicationRouter.post(...transfer(processController[funcName]))
-}
-
+const demoApplicationRouter = new CustomerRouter(processController).router
 export default demoApplicationRouter
