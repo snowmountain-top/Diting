@@ -268,7 +268,7 @@ mockMap[loggerMock.alias] = loggerMock
 
 /** mq Mock */
 class MqProducerMock extends MockInit {
-  dependencePath: string = path.join(__dirname, '../../src/demo/core/message/producer.ts')
+  dependencePath: string = path.join(__dirname, '../../src/demo/core/connection/mqProducer.ts')
 
   alias: string = 'MQProducer'
 
