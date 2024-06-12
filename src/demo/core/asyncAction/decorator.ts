@@ -17,7 +17,7 @@ export function AsyncClass() {
       if (propertyName !== 'constructor' && typeof prototype[propertyName] === 'function') {
         const originalMethod = prototype[propertyName]
         prototype[propertyName] = async function (...args: any[]) {
-          if (!asyncProducer) asyncProducer = new MQProducer(envConfig.ASYNC_TASK_TOPIC)
+          if (!asyncProducer) asyncProducer = new MQProducer(envConfig.ASYNC_TASK_TOPIC, 'direct')
           // 消费者消费时，最后一个参数是一个对象，用来标识是否消费场景
           const lastParam = args[args.length - 1]
           if (typeof lastParam === 'object' && lastParam.consumeSwitch)
