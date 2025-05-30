@@ -1,3 +1,5 @@
-# CloudContainerDemo
+# Diting (谛听)
 
-CloudContainerDemo - 云托管容器示例
+谛听, 地藏菩萨坐骑，可辨万物真假，听察人心.
+
+数据统计平台. 依据调度策略将自定义sql的统计结果输出到飞书文档.
