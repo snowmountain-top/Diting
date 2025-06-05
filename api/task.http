@@ -1,0 +1,65 @@
+@baseUrl = http://127.0.0.1:8090/task
+###
+POST {{baseUrl}}/create HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "name": "testTask",
+  "sql": "select * from PositiveOrder where id = '683e9c39d65e389524169bf247';",
+  "cronExpression": "*/5 * * * * *",
+  "jsScript": "return data",
+  "runMode": "CRON",
+  "creatorName": "testUser",
+  "updaterName": "testUser",
+  "feishuMetaData": {
+    "url": "https://8848-top.feishu.cn/wiki/ZkPUw9h4OilgUXkjk5lcqL3WnAc?fromScene=spaceOverview&table=tblUtnoGFJOIraIK&view=vewDpHgpmM",
+    "tableId": "tblUtnoGFJOIraIK",
+    "objToken": "Tka9bypXdaeFeAsNi1KcE9qknTh",
+    "wikiId": "ZkPUw9h4OilgUXkjk5lcqL3WnAc"
+  }
+}
+
+###
+POST {{baseUrl}}/update HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "id": "683fc0a818ae193d2bc13be0",
+  "operatorName": "mc",
+  "attributes": {
+    "name": "测试任务名称",
+    "sql": "select * from test where 1=1"
+  }
+}
+
+###
+POST {{baseUrl}}/change-status HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "id": "683fc0a818ae193d2bc13be0",
+  "operatorName": "mc",
+  "status": "INACTIVE"
+}
+
+###
+POST {{baseUrl}}/query HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "name": "test",
+  "pageIndex": 0,
+  "pageSize": 100
+}

@@ -1,0 +1,14 @@
+@baseUrl = http://127.0.0.1:8090/task-record
+
+###
+POST {{baseUrl}}/query-by-task-id HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "taskId": "",
+  "pageIndex": 0,
+  "pageSize": 100
+}
