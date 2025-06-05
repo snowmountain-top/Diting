@@ -116,6 +116,11 @@ export namespace DitingTypes {
       /** 执行人 */
       executorName: string
     }
+
+    export interface ITaskGenCronExpressionRequest {
+      /** 任务描述 */
+      content: string
+    }
   }
 
   export namespace Response {
@@ -150,6 +155,8 @@ export namespace DitingTypes {
     query(request: Request.ITaskQueryRequest): Promise<Response.ITaskQueryResponse>
     /** 手动执行任务 */
     manualRun(request: Request.ITaskManualRunRequest): Promise<void>
+    /** AI推导cron表达式 */
+    genCronExpression(request: Request.ITaskGenCronExpressionRequest): Promise<string>
   }
 
   export interface ITaskRecordController {

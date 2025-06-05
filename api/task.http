@@ -63,3 +63,14 @@ x-wx-appid: "appid"
   "pageIndex": 0,
   "pageSize": 100
 }
+
+###
+POST {{baseUrl}}/gen-cron-expression HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "content": "每个月的周三的凌晨3点20分执行"
+}

@@ -116,6 +116,16 @@ class TaskController implements DitingTypes.ITaskController {
     }
     await scheduleService.startJob(task)
   }
+
+  @ZodFunctionValidate({
+    request: z.object({
+      content: z.string(),
+    }),
+  })
+  async genCronExpression(request: DitingTypes.Request.ITaskGenCronExpressionRequest): Promise<string> {
+    if (!request.content) throw new BizError('内容不能为空')
+    return taskService.genCronExpression(request.content)
+  }
 }
 
 const taskController = new TaskController()

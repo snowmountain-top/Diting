@@ -3,6 +3,7 @@ import taskRepository from '../../repository/database/task'
 import TaskEntity from '../../entity/Task'
 import { TaskStatus } from '../../../enum'
 import EntityBuilder from '../builder/entityBuilder'
+import difyClient from '../../../vendors/dify'
 
 class TaskService {
   async get(taskId: string) {
@@ -57,6 +58,10 @@ class TaskService {
 
   async queryAllActiveCronTask() {
     return taskRepository.queryAllActiveCronTask()
+  }
+
+  async genCronExpression(content: string) {
+    return difyClient.genCronExpression(content)
   }
 }
 
