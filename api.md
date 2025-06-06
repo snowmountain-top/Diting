@@ -1,17 +1,17 @@
-# Diting API 接口文档
+# Diting API 文档
 
-## 基础信息
+## 基本信息
 
-- 基础路径: `/`
-- 认证方式: 所有接口都需要通过 `authMiddleware` 进行认证
-- 响应格式: JSON
+- **基础路径**: `/`
+- **认证方式**: JWT认证（通过请求头传递）
+- **响应格式**:
 
 ```json
 {
   "data": 响应数据,
   "message": "success",
   "success": true,
-  "requestId": "请求追踪ID"
+  "requestId": "请求ID"
 }
 ```
 
@@ -22,36 +22,26 @@
 - **URL**: `/task/create`
 - **方法**: POST
 - **描述**: 创建一个新的任务
+- **请求参数**:
 
-**请求参数**:
-
-```typescript
+```json
 {
-  /** 任务名称 */
-  name: string;
-  /** SQL语句 */
-  sql: string;
-  /** JavaScript脚本 */
-  jsScript: string;
-  /** CRON表达式 (格式: 0 0 * * * *) */
-  cronExpression: string;
-  /** 运行方式 */
-  runMode: "MANUAL" | "CRON";
-  /** 飞书表格URL */
-  feishuTableUrl: string;
-  /** 创建者 */
-  creatorName: string;
-  /** 更新者 */
-  updaterName: string;
+  "name": "任务名称",
+  "sql": "SQL语句",
+  "jsScript": "JavaScript脚本",
+  "cronExpression": "CRON表达式 (格式: 0 0 * * * *)",
+  "runMode": "运行方式",
+  "feishuTableUrl": "飞书表格URL",
+  "creatorName": "创建者",
+  "updaterName": "更新者"
 }
 ```
 
-**响应**:
+- **响应**:
 
-```typescript
+```json
 {
-  /** 任务ID */
-  id: string;
+  "id": "任务ID"
 }
 ```
 
@@ -59,294 +49,203 @@
 
 - **URL**: `/task/update`
 - **方法**: POST
-- **描述**: 更新现有任务的属性
+- **描述**: 更新任务信息
+- **请求参数**:
 
-**请求参数**:
-
-```typescript
+```json
 {
-  /** 任务ID */
-  id: string;
-  /** 操作者名称 */
-  operatorName: string;
-  /** 要更新的属性 */
-  attributes: {
-    /** 任务名称 (可选) */
-    name?: string;
-    /** SQL语句 (可选) */
-    sql?: string;
-    /** JavaScript脚本 (可选) */
-    jsScript?: string;
-    /** CRON表达式 (可选, 格式: 0 0 * * * *) */
-    cronExpression?: string;
-  };
+  "id": "任务ID",
+  "operatorName": "操作者",
+  "attributes": {
+    "name": "任务名称",
+    "sql": "SQL语句",
+    "jsScript": "JavaScript脚本",
+    "cronExpression": "CRON表达式"
+  }
 }
 ```
 
-**响应**: 无返回数据
+- **响应**: 无
 
-### 3. 修改任务状态
+### 3. 获取任务详情
+
+- **URL**: `/task/get-detail`
+- **方法**: POST
+- **描述**: 获取任务详细信息
+- **请求参数**:
+
+```json
+{
+  "id": "任务ID"
+}
+```
+
+- **响应**:
+
+```json
+{
+  "id": "任务ID",
+  "name": "任务名称",
+  "status": "任务状态",
+  "runMode": "运行方式",
+  "sql": "SQL语句",
+  "jsScript": "JavaScript脚本",
+  "cronExpression": "CRON表达式",
+  "creatorName": "创建者",
+  "updaterName": "更新者",
+  "feishuMetaData": {
+    "url": "飞书表格URL",
+    "tableId": "表格ID",
+    "objToken": "对象Token"
+  },
+  "createdAt": 创建时间,
+  "updatedAt": 更新时间,
+  "deletedAt": 删除时间
+}
+```
+
+### 4. 改变任务状态
 
 - **URL**: `/task/change-status`
 - **方法**: POST
-- **描述**: 修改任务的状态
+- **描述**: 修改任务状态
+- **请求参数**:
 
-**请求参数**:
-
-```typescript
+```json
 {
-  /** 任务ID */
-  id: string;
-  /** 操作者名称 */
-  operatorName: string;
-  /** 任务状态 */
-  status: "ACTIVE" | "INACTIVE" | "DELETED";
+  "id": "任务ID",
+  "operatorName": "操作者",
+  "status": "任务状态"
 }
 ```
 
-**响应**: 无返回数据
+- **响应**: 无
 
-### 4. 查询任务列表
+### 5. 查询任务列表
 
 - **URL**: `/task/query`
 - **方法**: POST
-- **描述**: 查询任务列表，支持分页、排序和筛选
+- **描述**: 分页查询任务列表
+- **请求参数**:
 
-**请求参数**:
-
-```typescript
+```json
 {
-  /** 任务名称 (可选) */
-  name?: string;
-  /** 任务状态 (可选) */
-  status?: ["ACTIVE" | "INACTIVE" | "DELETED"];
-  /** 页码 (从0开始) */
-  pageIndex: number;
-  /** 每页大小 (1-100) */
-  pageSize: number;
-  /** 排序 (可选) */
-  sort?: {
-    createdAt?: "DESC" | "ASC";
-  };
+  "name": "任务名称（可选）",
+  "status": ["任务状态（可选）"],
+  "pageIndex": 页码,
+  "pageSize": 每页大小,
+  "sort": {
+    "createdAt": "DESC或ASC（可选）"
+  }
 }
 ```
 
-**响应**:
+- **响应**:
 
-```typescript
+```json
 {
-  /** 任务列表 */
-  data: [
-    {
-      /** 任务ID */
-      id: string;
-      /** 任务名称 */
-      name: string;
-      /** 任务状态 */
-      status: "ACTIVE" | "INACTIVE" | "DELETED";
-      /** 运行方式 */
-      runMode: "MANUAL" | "CRON";
-      /** SQL语句 */
-      sql: string;
-      /** JavaScript脚本 */
-      jsScript: string;
-      /** CRON表达式 */
-      cronExpression: string;
-      /** 创建者 */
-      creatorName: string;
-      /** 更新者 */
-      updaterName: string;
-      /** 飞书表元数据 */
-      feishuMetaData: {
-        url: string;
-        wikiId: string;
-        tableId: string;
-        objToken: string;
-      };
-      /** 创建时间 */
-      createdAt: number;
-      /** 更新时间 */
-      updatedAt: number;
-      /** 删除时间 */
-      deletedAt: number;
-    }
-  ];
-  /** 总条数 */
-  total: number;
+  "data": [任务对象数组],
+  "total": 总条数
 }
 ```
 
-### 5. 手动执行任务
+### 6. 手动执行任务
 
 - **URL**: `/task/manual-run`
 - **方法**: POST
-- **描述**: 手动执行一个任务
+- **描述**: 手动触发任务执行
+- **请求参数**:
 
-**请求参数**:
-
-```typescript
+```json
 {
-  /** 任务ID */
-  taskId: string;
-  /** 执行人 */
-  executorName: string;
+  "taskId": "任务ID",
+  "executorName": "执行人"
 }
 ```
 
-**响应**: 无返回数据
+- **响应**: 无
 
-### 6. 生成CRON表达式
+### 7. AI推导CRON表达式
 
 - **URL**: `/task/gen-cron-expression`
 - **方法**: POST
-- **描述**: 通过AI将自然语言描述转换为CRON表达式
+- **描述**: 根据任务描述生成CRON表达式
+- **请求参数**:
 
-**请求参数**:
-
-```typescript
+```json
 {
-  /** 任务描述 (例如: "每个月的周三晚上21点18分21秒") */
-  content: string;
+  "content": "任务描述"
 }
 ```
 
-**响应**:
+- **响应**: CRON表达式字符串
 
-```typescript
-"0 18 21 * * 3" // 返回CRON表达式字符串
+### 8. 获取飞书表格元数据
+
+- **URL**: `/task/get-feishu-table-meta-data`
+- **方法**: POST
+- **描述**: 根据飞书表格URL获取表格元数据
+- **请求参数**:
+
+```json
+{
+  "url": "飞书表格URL"
+}
+```
+
+- **响应**:
+
+```json
+{
+  "tableId": "表格ID",
+  "tableName": "表格名称",
+  "viewId": "视图ID",
+  "objToken": "对象Token",
+  "columnNames": ["表头数组"]
+}
 ```
 
 ## 任务记录接口
 
-### 1. 查询任务记录
+### 1. 根据任务查询记录
 
 - **URL**: `/task-record/query-by-task-id`
 - **方法**: POST
-- **描述**: 根据任务ID查询任务执行记录
-
-**请求参数**:
-
-```typescript
-{
-  /** 任务ID */
-  taskId: string;
-  /** 页码 (从1开始) */
-  pageIndex: number;
-  /** 每页大小 (1-100) */
-  pageSize: number;
-}
-```
-
-**响应**:
-
-```typescript
-{
-  /** 任务记录列表 */
-  data: [
-    {
-      /** 记录ID */
-      id: string;
-      /** 关联任务ID */
-      taskId: string;
-      /** 任务执行时间 */
-      executionTime: number;
-      /** 任务状态 */
-      status: "SUCCESS" | "FAILED" | "WAITING";
-      /** SQL语句 */
-      sql: string;
-      /** JavaScript脚本 */
-      jsScript: string;
-      /** 飞书表元数据 */
-      feishuMetaData: {
-        url: string;
-        wikiId: string;
-        tableId: string;
-        objToken: string;
-      };
-      /** CRON表达式 */
-      cronExpression: string;
-      /** 运行方式 */
-      runMode: "MANUAL" | "CRON";
-      /** 执行时长(秒) */
-      durationSec: number;
-      /** 错误日志 */
-      errorLog: string;
-      /** 创建时间 */
-      createdAt: number;
-      /** 更新时间 */
-      updatedAt: number;
-      /** 删除时间 */
-      deletedAt: number;
-    }
-  ];
-  /** 总条数 */
-  total: number;
-}
-```
-
-## 首页接口
-
-### 1. 首页
-
-- **URL**: `/`
-- **方法**: GET
-- **描述**: 应用首页
-
-**响应**:
+- **描述**: 查询指定任务的执行记录
+- **请求参数**:
 
 ```json
 {
-  "message": "Hello World"
+  "taskId": "任务ID",
+  "pageIndex": 页码,
+  "pageSize": 每页大小
+}
+```
+
+- **响应**:
+
+```json
+{
+  "data": [任务记录对象数组],
+  "total": 总条数
 }
 ```
 
 ## 枚举值说明
 
-### 任务状态 (TaskStatus)
+### TaskStatus（任务状态）
 
 - `ACTIVE`: 已启用
 - `INACTIVE`: 已禁用
 - `DELETED`: 已删除
 
-### 任务运行模式 (TaskRunMode)
+### TaskRunMode（任务运行模式）
 
 - `MANUAL`: 手动执行
 - `CRON`: 定时执行
 
-### 任务记录状态 (TaskRecordStatus)
+### TaskRecordStatus（任务记录状态）
 
 - `SUCCESS`: 任务成功
 - `FAILED`: 任务失败
 - `WAITING`: 等待中
-
-### 7. 获取飞书表格元数据
-
-- **URL**: `/task/get-feishu-table-metadata`
-- **方法**: POST
-- **描述**: 根据飞书表格URL获取表格的元数据信息
-
-**请求参数**:
-
-```typescript
-{
-  /** 飞书表格URL */
-  url: string;
-}
-```
-
-**响应**:
-
-```typescript
-{
-  /** 表格Id */
-  tableId: string;
-  /** 表格名称 */
-  tableName: string;
-  /** 视图Id */
-  viewId: string;
-  /** ObjectToken */
-  objToken: string;
-  /** 表头 */
-  columnNames: string[];
-}
-```

@@ -6,9 +6,9 @@ import { ZodFunctionValidate } from '../../utils/ZodFunctionValidate'
 import { isCronExp } from '../../utils/regValidator'
 import { BizError } from '@be-link/shield-cli-nodejs'
 import scheduleService from '../../core/modules/schedule/service'
+import TaskEntity from '../../core/entity/Task'
 
 class TaskController implements DitingTypes.ITaskController {
-
   @ZodFunctionValidate({
     request: z.object({
       name: z.string(),
@@ -64,13 +64,24 @@ class TaskController implements DitingTypes.ITaskController {
             .string()
             .refine((val) => isCronExp(val), { message: 'CRON 表达式格式无效，示例: 0 0 * * * *' })
             .optional(),
+          feishuTableUrl: z.string().optional(),
         })
         .refine((val) => Object.keys(val).length > 0, { message: '至少更新一个字段' }),
     }),
   })
   async update(request: DitingTypes.Request.ITaskUpdateRequest): Promise<void> {
     request.attributes.updaterName = request.operatorName
-    await taskService.update(request.id, request.attributes)
+    const updateAttrs: Partial<TaskEntity> = { ...request }
+    delete updateAttrs['feishuTableUrl']
+    if (request.attributes.feishuTableUrl) {
+      const feishuMetaData = await taskService.getFeishuTableMetaData(request.attributes.feishuTableUrl)
+      updateAttrs.feishuMetaData = {
+        url: request.attributes.feishuTableUrl,
+        tableId: feishuMetaData.tableId,
+        objToken: feishuMetaData.objToken,
+      }
+    }
+    await taskService.update(request.id, updateAttrs)
   }
 
   @ZodFunctionValidate({
@@ -147,6 +158,19 @@ class TaskController implements DitingTypes.ITaskController {
   getFeishuTableMetaData(request: DitingTypes.Request.ITaskGetFeishuTableMetaDataRequest)
     : Promise<DitingTypes.Response.IGetFeishuTableMetaDataResponse> {
     return taskService.getFeishuTableMetaData(request.url)
+  }
+
+  @ZodFunctionValidate({
+    request: z.object({
+      id: z.string(),
+    }),
+  })
+  async getDetail(request: { id: string }): Promise<DitingTypes.Dto.TaskDto> {
+    const task = await taskService.get(request.id)
+    if (!task) {
+      throw new BizError('任务不存在')
+    }
+    return task.dto()
   }
 }
 

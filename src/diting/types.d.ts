@@ -90,7 +90,7 @@ export namespace DitingTypes {
     export type ITaskUpdateRequest = {
       id: string
       operatorName: string
-      attributes: Partial<ITaskCreateRequest>
+      attributes: Partial<Omit<ITaskCreateRequest, ['creatorName', 'updaterName', 'runMode']>>
     }
 
     export type ITaskChangeStatusRequest = {
@@ -180,6 +180,8 @@ export namespace DitingTypes {
     create(request: Request.ITaskCreateRequest): Promise<Response.ITaskCreateResponse>
     /** 更新任务 */
     update(request: Request.ITaskUpdateRequest): Promise<void>
+    /** 查询任务详情 */
+    getDetail(request: { id: string }): Promise<Dto.TaskDto>
     /** 改变任务状态 */
     changeStatus(request: Request.ITaskChangeStatusRequest): Promise<void>
     /** 查询任务列表 */
