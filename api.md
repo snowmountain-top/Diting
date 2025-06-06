@@ -37,13 +37,8 @@
   cronExpression: string;
   /** 运行方式 */
   runMode: "MANUAL" | "CRON";
-  /** 飞书表元数据 */
-  feishuMetaData: {
-    url: string;
-    wikiId: string;
-    tableId: string;
-    objToken: string;
-  };
+  /** 飞书表格URL */
+  feishuTableUrl: string;
   /** 创建者 */
   creatorName: string;
   /** 更新者 */
@@ -323,3 +318,35 @@
 - `SUCCESS`: 任务成功
 - `FAILED`: 任务失败
 - `WAITING`: 等待中
+
+### 7. 获取飞书表格元数据
+
+- **URL**: `/task/get-feishu-table-metadata`
+- **方法**: POST
+- **描述**: 根据飞书表格URL获取表格的元数据信息
+
+**请求参数**:
+
+```typescript
+{
+  /** 飞书表格URL */
+  url: string;
+}
+```
+
+**响应**:
+
+```typescript
+{
+  /** 表格Id */
+  tableId: string;
+  /** 表格名称 */
+  tableName: string;
+  /** 视图Id */
+  viewId: string;
+  /** ObjectToken */
+  objToken: string;
+  /** 表头 */
+  columnNames: string[];
+}
+```

@@ -24,7 +24,6 @@ export namespace DitingTypes {
       /** 飞书表元数据 */
       feishuMetaData: {
         url: string
-        wikiId: string
         tableId: string
         objToken: string
       }
@@ -69,10 +68,24 @@ export namespace DitingTypes {
   }
 
   export namespace Request {
-    export type ITaskCreateRequest = Omit<
-      Dto.TaskDto,
-      ['id', 'status', 'runMode', 'createdAt', 'updatedAt', 'deletedAt']
-    >
+    export type ITaskCreateRequest = {
+      /** 任务名称 */
+      name: string
+      /** SQL语句 */
+      sql: string
+      /** JavaScript脚本 */
+      jsScript: string
+      /** CRON表达式 (格式: 0 0 * * * *) */
+      cronExpression: string
+      /** 运行方式 */
+      runMode: TaskRunMode
+      /** 飞书表元数据 */
+      feishuTableUrl: string
+      /** 创建者 */
+      creatorName: string
+      /** 更新者 */
+      updaterName: string
+    }
 
     export type ITaskUpdateRequest = {
       id: string
@@ -142,6 +155,19 @@ export namespace DitingTypes {
       /** 总条数 */
       total: number
     }
+
+    export interface IGetFeishuTableMetaDataResponse {
+      /** 表格Id */
+      tableId: string
+      /** 表格名称 */
+      tableName: string
+      /** 视图Id */
+      viewId: string
+      /** ObjectToken */
+      objToken: string
+      /** 表头 */
+      columnNames: string[]
+    }
   }
 
   export interface ITaskController {
@@ -157,6 +183,8 @@ export namespace DitingTypes {
     manualRun(request: Request.ITaskManualRunRequest): Promise<void>
     /** AI推导cron表达式 */
     genCronExpression(request: Request.ITaskGenCronExpressionRequest): Promise<string>
+    /** 根据飞书表格url获取表格元数据 */
+    getFeishuTableMetaData(url: string): Promise<Response.IGetFeishuTableMetaDataResponse>
   }
 
   export interface ITaskRecordController {

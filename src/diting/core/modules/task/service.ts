@@ -4,6 +4,7 @@ import TaskEntity from '../../entity/Task'
 import { TaskStatus } from '../../../enum'
 import EntityBuilder from '../builder/entityBuilder'
 import difyClient from '../../../vendors/dify'
+import feishuClient from '../../../vendors/feishuClient'
 
 class TaskService {
   async get(taskId: string) {
@@ -62,6 +63,10 @@ class TaskService {
 
   async genCronExpression(content: string) {
     return difyClient.genCronExpression(content)
+  }
+
+  async getFeishuTableMetaData(url: string) {
+    return feishuClient.getTableMetaDataFromUrl(url)
   }
 }
 

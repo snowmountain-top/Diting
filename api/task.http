@@ -9,17 +9,12 @@ x-wx-appid: "appid"
 {
   "name": "testTask",
   "sql": "select * from PositiveOrder where id = '683e9c39d65e389524169bf247';",
-  "cronExpression": "*/5 * * * * *",
+  "cronExpression": "",
   "jsScript": "return data",
-  "runMode": "CRON",
+  "runMode": "MANUAL",
   "creatorName": "testUser",
   "updaterName": "testUser",
-  "feishuMetaData": {
-    "url": "https://8848-top.feishu.cn/wiki/ZkPUw9h4OilgUXkjk5lcqL3WnAc?fromScene=spaceOverview&table=tblUtnoGFJOIraIK&view=vewDpHgpmM",
-    "tableId": "tblUtnoGFJOIraIK",
-    "objToken": "Tka9bypXdaeFeAsNi1KcE9qknTh",
-    "wikiId": "ZkPUw9h4OilgUXkjk5lcqL3WnAc"
-  }
+  "feishuTableUrl": "https://8848-top.feishu.cn/wiki/ZkPUw9h4OilgUXkjk5lcqL3WnAc?fromScene=spaceOverview&table=tblUtnoGFJOIraIK&view=vewDpHgpmM"
 }
 
 ###

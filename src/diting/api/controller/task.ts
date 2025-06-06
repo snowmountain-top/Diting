@@ -15,7 +15,9 @@ class TaskController implements DitingTypes.ITaskController {
       jsScript: z.string(),
       cronExpression: z
         .string()
-        .refine(isCronExp, { message: 'CRON 表达式格式无效，示例: 0 0 * * * *' }),
+        .refine(
+          (val) => val ? isCronExp(val) : true,
+          { message: 'CRON 表达式格式无效，示例: 0 0 * * * *' }),
       runMode: z.nativeEnum(TaskRunMode),
       feishuMetaData: z.object({
         url: z.string(),
@@ -30,7 +32,21 @@ class TaskController implements DitingTypes.ITaskController {
   async create(
     request: DitingTypes.Request.ITaskCreateRequest,
   ): Promise<DitingTypes.Response.ITaskCreateResponse> {
-    const task = await taskService.create(request)
+    const feishuMetaData = await taskService.getFeishuTableMetaData(request.feishuTableUrl)
+    const task = await taskService.create({
+      name: request.name,
+      sql: request.sql,
+      jsScript: request.jsScript,
+      cronExpression: request.cronExpression,
+      runMode: request.runMode,
+      feishuMetaData: {
+        url: request.feishuTableUrl,
+        tableId: feishuMetaData.tableId,
+        objToken: feishuMetaData.objToken,
+      },
+      creatorName: request.creatorName,
+      updaterName: request.updaterName,
+    })
     if (task.runMode === TaskRunMode.CRON) {
       scheduleService.startJob(task)
     }
@@ -125,6 +141,15 @@ class TaskController implements DitingTypes.ITaskController {
   async genCronExpression(request: DitingTypes.Request.ITaskGenCronExpressionRequest): Promise<string> {
     if (!request.content) throw new BizError('内容不能为空')
     return taskService.genCronExpression(request.content)
+  }
+
+  @ZodFunctionValidate({
+    request: z.object({
+      url: z.string(),
+    }),
+  })
+  getFeishuTableMetaData(url: string): Promise<DitingTypes.Response.IGetFeishuTableMetaDataResponse> {
+    return taskService.getFeishuTableMetaData(url)
   }
 }
 
