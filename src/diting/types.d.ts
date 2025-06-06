@@ -134,6 +134,11 @@ export namespace DitingTypes {
       /** 任务描述 */
       content: string
     }
+
+    export interface ITaskGetFeishuTableMetaDataRequest {
+      /** 飞书表格url */
+      url: string
+    }
   }
 
   export namespace Response {
@@ -184,7 +189,8 @@ export namespace DitingTypes {
     /** AI推导cron表达式 */
     genCronExpression(request: Request.ITaskGenCronExpressionRequest): Promise<string>
     /** 根据飞书表格url获取表格元数据 */
-    getFeishuTableMetaData(url: string): Promise<Response.IGetFeishuTableMetaDataResponse>
+    getFeishuTableMetaData(request: Request.ITaskGetFeishuTableMetaDataRequest)
+      : Promise<Response.IGetFeishuTableMetaDataResponse>
   }
 
   export interface ITaskRecordController {

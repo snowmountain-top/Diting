@@ -69,3 +69,14 @@ x-wx-appid: "appid"
 {
   "content": "每个月的周三的凌晨3点20分执行"
 }
+
+###
+POST {{baseUrl}}/get-feishu-table-meta-data HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "url": "https://8848-top.feishu.cn/wiki/ZkPUw9h4OilgUXkjk5lcqL3WnAc?table=tblUtnoGFJOIraIK&view=vewDpHgpmM"
+}

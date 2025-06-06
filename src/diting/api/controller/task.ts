@@ -8,6 +8,7 @@ import { BizError } from '@be-link/shield-cli-nodejs'
 import scheduleService from '../../core/modules/schedule/service'
 
 class TaskController implements DitingTypes.ITaskController {
+
   @ZodFunctionValidate({
     request: z.object({
       name: z.string(),
@@ -148,8 +149,9 @@ class TaskController implements DitingTypes.ITaskController {
       url: z.string(),
     }),
   })
-  getFeishuTableMetaData(url: string): Promise<DitingTypes.Response.IGetFeishuTableMetaDataResponse> {
-    return taskService.getFeishuTableMetaData(url)
+  getFeishuTableMetaData(request: DitingTypes.Request.ITaskGetFeishuTableMetaDataRequest)
+    : Promise<DitingTypes.Response.IGetFeishuTableMetaDataResponse> {
+    return taskService.getFeishuTableMetaData(request.url)
   }
 }
 
