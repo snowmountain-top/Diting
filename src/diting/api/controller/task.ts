@@ -20,12 +20,7 @@ class TaskController implements DitingTypes.ITaskController {
           (val) => val ? isCronExp(val) : true,
           { message: 'CRON 表达式格式无效，示例: 0 0 * * * *' }),
       runMode: z.nativeEnum(TaskRunMode),
-      feishuMetaData: z.object({
-        url: z.string(),
-        wikiId: z.string(),
-        tableId: z.string(),
-        objToken: z.string(),
-      }),
+      feishuTableUrl: z.string(),
       creatorName: z.string(),
       updaterName: z.string(),
     }),
