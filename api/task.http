@@ -24,14 +24,7 @@ x-wx-openid: "test"
 x-wx-unionid: "ttt"
 x-wx-appid: "appid"
 
-{
-  "id": "683fc0a818ae193d2bc13be0",
-  "operatorName": "mc",
-  "attributes": {
-    "name": "测试任务名称",
-    "sql": "select * from test where 1=1"
-  }
-}
+{"id":"68429734ae20db2eef0b5d05","operatorName":"系统用户","attributes":{"name":"睦辰测试","sql":"select 789 as cnt;","jsScript":"return data.map((item) => {\n  return {\n    \"数字\": item.a\n  }\n})","cronExpression":"0 0 20 * * *","feishuTableUrl":"https://8848-top.feishu.cn/wiki/FZb7wjIx7i2UqTkCPmYcKeh1nrd?table=tbltr7bePP15a7fO&view=vewf0uE3Z6"}}
 
 ###
 POST {{baseUrl}}/change-status HTTP/1.1

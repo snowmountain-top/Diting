@@ -71,7 +71,7 @@ class TaskController implements DitingTypes.ITaskController {
   })
   async update(request: DitingTypes.Request.ITaskUpdateRequest): Promise<void> {
     request.attributes.updaterName = request.operatorName
-    const updateAttrs: Partial<TaskEntity> = { ...request }
+    const updateAttrs: Partial<TaskEntity> = { ...request.attributes }
     delete updateAttrs['feishuTableUrl']
     if (request.attributes.feishuTableUrl) {
       const feishuMetaData = await taskService.getFeishuTableMetaData(request.attributes.feishuTableUrl)
