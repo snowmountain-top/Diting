@@ -3,7 +3,7 @@
     {
       "name": "diting-api",
       "script": "./api/app.js",
-      "instances": 0
+      "instances": 1
     }
   ]
 }
