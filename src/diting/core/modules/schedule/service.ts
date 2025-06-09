@@ -2,7 +2,7 @@ import { CronJob } from 'cron'
 import * as fns from 'date-fns'
 import taskService from '../task/service'
 import TaskEntity from '../../entity/Task'
-import { TaskRecordStatus, TaskRunMode } from '../../../enum'
+import { TaskRecordStatus, TaskRunMode, TaskStatus } from '../../../enum'
 import executionService from '../execution/service'
 import getLogger from '../../../utils/logger'
 import TaskRecordEntity from '../../entity/TaskRecord'
@@ -30,7 +30,13 @@ class ScheduleService {
       // 手动执行方式: 延后5s. 或按照cron表达式执行
       task.runMode === TaskRunMode.MANUAL ? fns.addSeconds(new Date(), 5) : task.cronExpression,
       async () => {
-        const taskRecord = await taskRecordService.initialFromTask(task)
+        const taskFromDB = await taskService.get(task.id)
+        if (taskFromDB.status !== TaskStatus.ACTIVE) {
+          logger.warn(`任务[${task.id}]状态不合法: ${task.status}`)
+          this.cleanJob(task.id)
+          return
+        }
+        const taskRecord = await taskRecordService.initialFromTask(taskFromDB)
         await this.executeJob(taskRecord)
         // 手动运行的任务需要清理数据
         if (task.runMode === TaskRunMode.MANUAL) {
@@ -39,6 +45,9 @@ class ScheduleService {
       },
       async () => {
         console.info('任务执行完成')
+        if (task.runMode === TaskRunMode.MANUAL) {
+          this.cleanJob(task.id)
+        }
       },
     )
     job.start()
