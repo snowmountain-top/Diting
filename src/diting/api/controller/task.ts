@@ -14,11 +14,9 @@ class TaskController implements DitingTypes.ITaskController {
       name: z.string(),
       sql: z.string(),
       jsScript: z.string(),
-      cronExpression: z
-        .string()
-        .refine(
-          (val) => val ? isCronExp(val) : true,
-          { message: 'CRON 表达式格式无效，示例: 0 0 * * * *' }),
+      cronExpression: z.string().refine((val) => (val ? isCronExp(val) : true), {
+        message: 'CRON 表达式格式无效，示例: 0 0 * * * *',
+      }),
       runMode: z.nativeEnum(TaskRunMode),
       feishuTableUrl: z.string(),
       creatorName: z.string(),
@@ -72,9 +70,11 @@ class TaskController implements DitingTypes.ITaskController {
   async update(request: DitingTypes.Request.ITaskUpdateRequest): Promise<void> {
     request.attributes.updaterName = request.operatorName
     const updateAttrs: Partial<TaskEntity> = { ...request.attributes }
-    delete updateAttrs['feishuTableUrl']
+    delete updateAttrs.feishuTableUrl
     if (request.attributes.feishuTableUrl) {
-      const feishuMetaData = await taskService.getFeishuTableMetaData(request.attributes.feishuTableUrl)
+      const feishuMetaData = await taskService.getFeishuTableMetaData(
+        request.attributes.feishuTableUrl,
+      )
       updateAttrs.feishuMetaData = {
         url: request.attributes.feishuTableUrl,
         tableId: feishuMetaData.tableId,
@@ -145,7 +145,9 @@ class TaskController implements DitingTypes.ITaskController {
       content: z.string(),
     }),
   })
-  async genCronExpression(request: DitingTypes.Request.ITaskGenCronExpressionRequest): Promise<string> {
+  async genCronExpression(
+    request: DitingTypes.Request.ITaskGenCronExpressionRequest,
+  ): Promise<string> {
     if (!request.content) throw new BizError('内容不能为空')
     return taskService.genCronExpression(request.content)
   }
@@ -155,8 +157,9 @@ class TaskController implements DitingTypes.ITaskController {
       url: z.string(),
     }),
   })
-  getFeishuTableMetaData(request: DitingTypes.Request.ITaskGetFeishuTableMetaDataRequest)
-    : Promise<DitingTypes.Response.IGetFeishuTableMetaDataResponse> {
+  getFeishuTableMetaData(
+    request: DitingTypes.Request.ITaskGetFeishuTableMetaDataRequest,
+  ): Promise<DitingTypes.Response.IGetFeishuTableMetaDataResponse> {
     return taskService.getFeishuTableMetaData(request.url)
   }
 

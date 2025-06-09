@@ -30,7 +30,7 @@ class FeishuClient {
       },
       params: {
         page_size: 100,
-      }
+      },
     })
     if (res.code !== 0) {
       logger.error(`查询飞书数据表列表失败: ${JSON.stringify(res)}`)
@@ -47,14 +47,17 @@ class FeishuClient {
       path: { app_token: objToken, table_id: tableId },
     })
 
-    const fields: { field_name: string; field_id: string}[] = []
-    for await (const res of iterator) fields.push(...res.items.map((item) => {
-      return {
-        field_name: item.field_name,
-        field_id: item.field_id,
-        field_type: item.type,
-      }
-    }))
+    const fields: { field_name: string; field_id: string }[] = []
+    for await (const res of iterator)
+      fields.push(
+        ...res.items.map((item) => {
+          return {
+            field_name: item.field_name,
+            field_id: item.field_id,
+            field_type: item.type,
+          }
+        }),
+      )
 
     return fields
   }
@@ -67,7 +70,7 @@ class FeishuClient {
       params: {
         token: wikiId,
         obj_type: 'wiki',
-      }
+      },
     })
     if (nodeRes.code !== 0) {
       logger.error(`查询飞书文档元数据失败: ${JSON.stringify(nodeRes)}`)
@@ -114,7 +117,12 @@ class FeishuClient {
     }
   }
 
-  async insertRecords(objToken: string, tableId: string, records: Record<string, any>[], batchInsertCnt = 500) {
+  async insertRecords(
+    objToken: string,
+    tableId: string,
+    records: Record<string, any>[],
+    batchInsertCnt = 500,
+  ) {
     // 检查表列名是否匹配
     const columnList = await this.queryTableColumns(objToken, tableId)
     const columnNames = columnList.map((item) => item.field_name)
@@ -131,9 +139,9 @@ class FeishuClient {
         },
         data: {
           records: chunk.map((item) => ({ fields: item })),
-        }
+        },
       })
-      if (res.code!== 0) {
+      if (res.code !== 0) {
         logger.error(`插入飞书数据表记录失败: ${JSON.stringify(res)}`)
         throw new BizError(`插入飞书数据表记录失败: ${res.code} | ${res.msg}`)
       }

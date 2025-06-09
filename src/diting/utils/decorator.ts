@@ -9,7 +9,11 @@ const logger = getLogger()
  * @param descriptor 属性描述符
  * @returns 修改后的属性描述符
  */
-export function logExecutionTime(target: any, methodName: string, descriptor: PropertyDescriptor): PropertyDescriptor {
+export function logExecutionTime(
+  target: any,
+  methodName: string,
+  descriptor: PropertyDescriptor,
+): PropertyDescriptor {
   const originalMethod = descriptor.value
 
   descriptor.value = async function (...args: any[]) {

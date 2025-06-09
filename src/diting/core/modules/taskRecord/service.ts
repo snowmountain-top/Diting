@@ -14,15 +14,11 @@ class TaskRecordService {
     await taskRecordRepository.update(id, attributes)
   }
 
-  async queryByTaskId(param: {
-    taskId?: string
-    pageIndex: number
-    pageSize: number
-  }) {
+  async queryByTaskId(param: { taskId?: string; pageIndex: number; pageSize: number }) {
     const { data, total } = await taskRecordRepository.queryByTaskId(
       param.taskId,
       param.pageIndex,
-      param.pageSize
+      param.pageSize,
     )
     return {
       data,

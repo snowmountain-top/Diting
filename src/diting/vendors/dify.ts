@@ -20,7 +20,7 @@ class DifyClient {
   private async callWorkflow<T>(
     apiKey: string,
     data: Record<string, any>,
-    responseMode: RESPONSE_MODE = 'blocking'
+    responseMode: RESPONSE_MODE = 'blocking',
   ): Promise<T> {
     const url = `${this.baseUrl}/workflows/run`
     const requestData = {
@@ -32,7 +32,7 @@ class DifyClient {
     }
     const headers = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     }
     try {
       const response = await axios.post<DifyResponse<T>>(url, requestData, { headers })
@@ -53,7 +53,10 @@ class DifyClient {
     const data = {
       content,
     }
-    const result = await this.callWorkflow<{cron_exp: string}>(this.GEN_CRON_EXPRESSION_API_KEY, data)
+    const result = await this.callWorkflow<{ cron_exp: string }>(
+      this.GEN_CRON_EXPRESSION_API_KEY,
+      data,
+    )
     return result.cron_exp
   }
 }

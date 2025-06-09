@@ -39,7 +39,7 @@ class ScheduleService {
       },
       async () => {
         console.info('任务执行完成')
-      }
+      },
     )
     job.start()
     this.addJob(task.id, job)

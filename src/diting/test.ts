@@ -1,6 +1,6 @@
-import { fetchRemoteConfig } from "./settings"
-import difyClient from "./vendors/dify"
-import feishuClient from "./vendors/feishuClient"
+import { fetchRemoteConfig } from './settings'
+import difyClient from './vendors/dify'
+import feishuClient from './vendors/feishuClient'
 
 async function main() {
   // await fetchRemoteConfig()

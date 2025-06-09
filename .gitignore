@@ -132,6 +132,7 @@ dist
 # package lock file
 package-lock.json
 pnpm.lock
+pnpm-lock.yaml
 bun.lock
 pnpm-workspace.yaml
 

@@ -191,8 +191,9 @@ export namespace DitingTypes {
     /** AI推导cron表达式 */
     genCronExpression(request: Request.ITaskGenCronExpressionRequest): Promise<string>
     /** 根据飞书表格url获取表格元数据 */
-    getFeishuTableMetaData(request: Request.ITaskGetFeishuTableMetaDataRequest)
-      : Promise<Response.IGetFeishuTableMetaDataResponse>
+    getFeishuTableMetaData(
+      request: Request.ITaskGetFeishuTableMetaDataRequest,
+    ): Promise<Response.IGetFeishuTableMetaDataResponse>
   }
 
   export interface ITaskRecordController {

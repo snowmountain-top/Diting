@@ -31,11 +31,7 @@ class ExecutionService {
     const processedData = await this.executeJsScript(taskRecord, originData)
     // 插入飞书表格
     const feishuMetaData = taskRecord.feishuMetaData
-    await feishuClient.insertRecords(
-      feishuMetaData.objToken,
-      feishuMetaData.tableId,
-      processedData,
-    )
+    await feishuClient.insertRecords(feishuMetaData.objToken, feishuMetaData.tableId, processedData)
   }
 }
 
