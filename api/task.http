@@ -73,3 +73,15 @@ x-wx-appid: "appid"
 {
   "url": "https://8848-top.feishu.cn/wiki/ZkPUw9h4OilgUXkjk5lcqL3WnAc?table=tblUtnoGFJOIraIK&view=vewDpHgpmM"
 }
+
+###
+POST {{baseUrl}}/manual-run HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "taskId": "68429734ae20db2eef0b5d05",
+  "executorName": "MC"
+}
