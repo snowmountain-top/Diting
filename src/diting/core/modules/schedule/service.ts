@@ -27,8 +27,8 @@ class ScheduleService {
    */
   async startJob(task: TaskEntity) {
     const job = new CronJob(
-      // 手动执行方式: 延后5s. 或按照cron表达式执行
-      task.runMode === TaskRunMode.MANUAL ? fns.addSeconds(new Date(), 5) : task.cronExpression,
+      // 手动执行方式: 延后3s. 或按照cron表达式执行
+      task.runMode === TaskRunMode.MANUAL ? fns.addSeconds(new Date(), 3) : task.cronExpression,
       async () => {
         const taskFromDB = await taskService.get(task.id)
         if (taskFromDB.status !== TaskStatus.ACTIVE) {
@@ -39,15 +39,12 @@ class ScheduleService {
         const taskRecord = await taskRecordService.initialFromTask(taskFromDB)
         await this.executeJob(taskRecord)
         // 手动运行的任务需要清理数据
-        if (task.runMode === TaskRunMode.MANUAL) {
-          this.cleanJob(task.id)
+        if (taskFromDB.runMode === TaskRunMode.MANUAL) {
+          this.cleanJob(taskFromDB.id)
         }
       },
       async () => {
         console.info('任务执行完成')
-        if (task.runMode === TaskRunMode.MANUAL) {
-          this.cleanJob(task.id)
-        }
       },
     )
     job.start()

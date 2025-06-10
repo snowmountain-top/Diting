@@ -27,8 +27,10 @@ class ExecutionService {
   async run(taskRecord: TaskRecordEntity) {
     // 执行SQL语句查询源数据
     const originData = await this.fetchRemoteData(taskRecord)
+    logger.info(`[${taskRecord.id}]已成功查询到 ${originData.length} 条源数据`)
     // 执行JavaScript脚本处理数据
     const processedData = await this.executeJsScript(taskRecord, originData)
+    logger.info(`[${taskRecord.id}]已成功处理 ${processedData.length} 条数据`)
     // 推数前操作
     if (taskRecord.config.deleteWholeFeishuTableDataBeforeRun) {
       // 删除飞书表格所有数据
@@ -36,10 +38,16 @@ class ExecutionService {
         taskRecord.feishuMetaData.objToken,
         taskRecord.feishuMetaData.tableId,
       )
+      logger.info(
+        `[${taskRecord.id}]已成功删除飞书表格[${taskRecord.feishuMetaData.tableId}]所有数据`,
+      )
     }
     // 插入飞书表格
     const feishuMetaData = taskRecord.feishuMetaData
     await feishuClient.insertRecords(feishuMetaData.objToken, feishuMetaData.tableId, processedData)
+    logger.info(
+      `[${taskRecord.id}]已成功插入 ${processedData.length} 条数据到飞书表格[${feishuMetaData.tableId}]`,
+    )
   }
 }
 
