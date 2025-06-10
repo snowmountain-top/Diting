@@ -70,6 +70,8 @@ class Logger {
       }
       // 不管什么日志，统一在上报时增加requestId
       item.pushBack(new clsSdk.Content('requestId', String(rTracer.id())))
+      // 统一添加环境标识
+      item.pushBack(new clsSdk.Content('env', process.env.NODE_ENV))
       item.setTime(Date.now())
       const logGroup = new clsSdk.LogGroup()
       logGroup.addLogs(item)
