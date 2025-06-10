@@ -5,6 +5,8 @@
 
 这是一个数据统计平台. 依据调度策略将自定义sql的统计结果输出到飞书文档.
 
+[工程文档](https://8848-top.feishu.cn/wiki/VAA6whSqkihCpSkhIaEcRVMMnLc?fromScene=spaceOverview)
+
 ## 项目结构说明
 
 ### 目录预览
