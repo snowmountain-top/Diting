@@ -73,6 +73,12 @@ export default class TaskRecordEntity extends BasicEntity {
   })
   feishuMetaData: DitingTypes.Dto.TaskRecordDto['feishuMetaData']
 
+  /** 任务设置项 */
+  config: {
+    /** 是否在运行前删除整表数据 */
+    deleteWholeFeishuTableDataBeforeRun: boolean
+  }
+
   @Column({
     type: 'text',
     default: '',
@@ -99,6 +105,7 @@ export default class TaskRecordEntity extends BasicEntity {
       jsScript: this.jsScript,
       runMode: this.runMode,
       feishuMetaData: this.feishuMetaData,
+      config: this.config,
       errorLog: this.errorLog,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,

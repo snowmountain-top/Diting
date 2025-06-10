@@ -86,6 +86,14 @@ export default class TaskEntity extends BasicEntity {
   })
   feishuMetaData: DitingTypes.Dto.TaskDto['feishuMetaData']
 
+  @Column({
+    type: 'json',
+    default: {},
+    comment: '任务配置',
+    nullable: false,
+  })
+  config: DitingTypes.Dto.TaskDto['config']
+
   dto(): DitingTypes.Dto.TaskDto {
     return {
       id: this.id,
@@ -94,6 +102,7 @@ export default class TaskEntity extends BasicEntity {
       jsScript: this.jsScript,
       cronExpression: this.cronExpression,
       feishuMetaData: this.feishuMetaData,
+      config: this.config,
       creatorName: this.creatorName,
       updaterName: this.updaterName,
       createdAt: this.createdAt,

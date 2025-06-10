@@ -19,6 +19,9 @@ class TaskController implements DitingTypes.ITaskController {
       }),
       runMode: z.nativeEnum(TaskRunMode),
       feishuTableUrl: z.string(),
+      config: z.object({
+        deleteWholeFeishuTableDataBeforeRun: z.boolean(),
+      }),
       creatorName: z.string(),
       updaterName: z.string(),
     }),
@@ -63,6 +66,11 @@ class TaskController implements DitingTypes.ITaskController {
             .refine((val) => isCronExp(val), { message: 'CRON 表达式格式无效，示例: 0 0 * * * *' })
             .optional(),
           feishuTableUrl: z.string().optional(),
+          config: z
+            .object({
+              deleteWholeFeishuTableDataBeforeRun: z.boolean().optional(),
+            })
+            .optional(),
         })
         .refine((val) => Object.keys(val).length > 0, { message: '至少更新一个字段' }),
     }),

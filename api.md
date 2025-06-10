@@ -1,9 +1,9 @@
 # Diting API 文档
 
-## 基础域名:
+## 基础域名
 
-- 测试环境: `http://121.5.55.198:8010`
-- 生产环境: `http://121.5.55.198:8011`
+- 测试环境: `https://diting-dev.api.8848top.cn`
+- 生产环境: `https://diting.api.8848top.cn`
 
 ## 基本信息
 
@@ -37,6 +37,9 @@
   "cronExpression": "CRON表达式 (格式: 0 0 * * * *)",
   "runMode": "运行方式",
   "feishuTableUrl": "飞书表格URL",
+  "config": {
+    "deleteWholeFeishuTableDataBeforeRun": false
+  },
   "creatorName": "创建者",
   "updaterName": "更新者"
 }
@@ -46,7 +49,12 @@
 
 ```json
 {
-  "id": "任务ID"
+  "data": {
+    "id": "任务ID"
+  },
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
 }
 ```
 
@@ -65,12 +73,16 @@
     "name": "任务名称",
     "sql": "SQL语句",
     "jsScript": "JavaScript脚本",
-    "cronExpression": "CRON表达式"
+    "cronExpression": "CRON表达式",
+    "feishuTableUrl": "飞书表格URL",
+    "config": {
+      "deleteWholeFeishuTableDataBeforeRun": false
+    }
   }
 }
 ```
 
-- **响应**: 无
+- **响应**: 无返回数据
 
 ### 3. 获取任务详情
 
@@ -89,23 +101,31 @@
 
 ```json
 {
-  "id": "任务ID",
-  "name": "任务名称",
-  "status": "任务状态",
-  "runMode": "运行方式",
-  "sql": "SQL语句",
-  "jsScript": "JavaScript脚本",
-  "cronExpression": "CRON表达式",
-  "creatorName": "创建者",
-  "updaterName": "更新者",
-  "feishuMetaData": {
-    "url": "飞书表格URL",
-    "tableId": "表格ID",
-    "objToken": "对象Token"
+  "data": {
+    "id": "任务ID",
+    "name": "任务名称",
+    "status": "任务状态",
+    "runMode": "运行方式",
+    "sql": "SQL语句",
+    "jsScript": "JavaScript脚本",
+    "cronExpression": "CRON表达式",
+    "creatorName": "创建者",
+    "updaterName": "更新者",
+    "feishuMetaData": {
+      "url": "飞书表格URL",
+      "tableId": "表格ID",
+      "objToken": "对象Token"
+    },
+    "config": {
+      "deleteWholeFeishuTableDataBeforeRun": false
+    },
+    "createdAt": 创建时间,
+    "updatedAt": 更新时间,
+    "deletedAt": 删除时间
   },
-  "createdAt": 创建时间,
-  "updatedAt": 更新时间,
-  "deletedAt": 删除时间
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
 }
 ```
 
@@ -124,7 +144,7 @@
 }
 ```
 
-- **响应**: 无
+- **响应**: 无返回数据
 
 ### 5. 查询任务列表
 
@@ -149,8 +169,13 @@
 
 ```json
 {
-  "data": [任务对象数组],
-  "total": 总条数
+  "data": {
+    "data": [任务对象数组],
+    "total": 总条数
+  },
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
 }
 ```
 
@@ -168,7 +193,7 @@
 }
 ```
 
-- **响应**: 无
+- **响应**: 无返回数据
 
 ### 7. AI推导CRON表达式
 
@@ -183,7 +208,16 @@
 }
 ```
 
-- **响应**: CRON表达式字符串
+- **响应**:
+
+```json
+{
+  "data": "0 0 * * * *",
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
+}
+```
 
 ### 8. 获取飞书表格元数据
 
@@ -202,11 +236,16 @@
 
 ```json
 {
-  "tableId": "表格ID",
-  "tableName": "表格名称",
-  "viewId": "视图ID",
-  "objToken": "对象Token",
-  "columnNames": ["表头数组"]
+  "data": {
+    "tableId": "表格ID",
+    "tableName": "表格名称",
+    "viewId": "视图ID",
+    "objToken": "对象Token",
+    "columnNames": ["表头数组"]
+  },
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
 }
 ```
 
@@ -231,8 +270,35 @@
 
 ```json
 {
-  "data": [任务记录对象数组],
-  "total": 总条数
+  "data": {
+    "data": [{
+      "id": "记录ID",
+      "taskId": "关联任务ID",
+      "executionTime": 执行时间,
+      "status": "任务记录状态",
+      "sql": "SQL语句",
+      "jsScript": "JavaScript脚本",
+      "feishuMetaData": {
+        "url": "飞书表格URL",
+        "tableId": "表格ID",
+        "objToken": "对象Token"
+      },
+      "config": {
+        "deleteWholeFeishuTableDataBeforeRun": false
+      },
+      "cronExpression": "CRON表达式",
+      "runMode": "运行方式",
+      "durationSec": 执行时长(秒),
+      "errorLog": "错误日志",
+      "createdAt": 创建时间,
+      "updatedAt": 更新时间,
+      "deletedAt": 删除时间
+    }],
+    "total": 总条数
+  },
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
 }
 ```
 
@@ -254,3 +320,33 @@
 - `SUCCESS`: 任务成功
 - `FAILED`: 任务失败
 - `WAITING`: 等待中
+
+## 认证说明
+
+所有接口都需要通过JWT认证，请在请求头中添加以下字段：
+
+```
+Authorization: Bearer {token}
+```
+
+## 错误处理
+
+当请求失败时，响应格式如下：
+
+```json
+{
+  "data": null,
+  "message": "错误信息",
+  "success": false,
+  "requestId": "请求ID"
+}
+```
+
+## 注意事项
+
+1. 所有接口都使用POST方法
+2. 请求参数必须是JSON格式
+3. 所有时间戳均为Unix时间戳（毫秒）
+4. 分页参数pageIndex从1开始
+5. CRON表达式格式：`秒 分 时 日 月 星期`
+6. 任务设置项config中的deleteWholeFeishuTableDataBeforeRun表示是否在运行前删除整表数据

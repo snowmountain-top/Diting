@@ -27,6 +27,11 @@ export namespace DitingTypes {
         tableId: string
         objToken: string
       }
+      /** 任务设置项 */
+      config: {
+        /** 是否在运行前删除整表数据 */
+        deleteWholeFeishuTableDataBeforeRun: boolean
+      }
       /** 创建时间 */
       createdAt: number
       /** 更新时间 */
@@ -50,6 +55,8 @@ export namespace DitingTypes {
       jsScript: string
       /** 飞书表元数据 */
       feishuMetaData: TaskDto['feishuMetaData']
+      /** 任务设置项 */
+      config: TaskDto['config']
       /** CRON表达式 */
       cronExpression: string
       /** 运行方式 */
@@ -81,6 +88,11 @@ export namespace DitingTypes {
       runMode: TaskRunMode
       /** 飞书表元数据 */
       feishuTableUrl: string
+      /** 任务设置项 */
+      config: {
+        /** 是否在运行前删除整表数据 */
+        deleteWholeFeishuTableDataBeforeRun: boolean
+      }
       /** 创建者 */
       creatorName: string
       /** 更新者 */

@@ -6,6 +6,25 @@ import { chunk } from 'lodash'
 
 const logger = getLogger()
 
+type LarkClient = lark.Client
+type GenTypeField = Awaited<
+  ReturnType<LarkClient['bitable']['v1']['appTableField']['listWithIterator']>
+>
+type YieldTypeField = GenTypeField extends {
+  [Symbol.asyncIterator]: () => AsyncGenerator<infer T, any, any>
+}
+  ? T
+  : never
+
+type GenTypeRecord = Awaited<
+  ReturnType<LarkClient['bitable']['v1']['appTableRecord']['listWithIterator']>
+>
+type YieldTypeRecord = GenTypeRecord extends {
+  [Symbol.asyncIterator]: () => AsyncGenerator<infer T, any, any>
+}
+  ? T
+  : never
+
 class FeishuClient {
   private client: lark.Client
 
@@ -146,6 +165,56 @@ class FeishuClient {
         throw new BizError(`插入飞书数据表记录失败: ${res.code} | ${res.msg}`)
       }
     }
+  }
+
+  async readTableData(param: { objToken: string; tableId: string; fieldNames?: string[] }) {
+    const iterator = await this.getClient().bitable.v1.appTableRecord.listWithIterator({
+      path: { app_token: param.objToken, table_id: param.tableId },
+      params: {
+        field_names: param.fieldNames?.length ? JSON.stringify(param.fieldNames) : undefined,
+      },
+    })
+
+    const records: YieldTypeRecord['items'] = []
+    for await (const res of iterator) records.push(...(res.items || []))
+
+    return records
+  }
+
+  /** 删除原始数据 */
+  async deleteOriginalData(param: { objToken: string; tableId: string; recordIds: string[] }) {
+    const chunks = chunk(param.recordIds, 500)
+    for (const chunkData of chunks) {
+      const res = await this.getClient().bitable.v1.appTableRecord.batchDelete({
+        path: { app_token: param.objToken, table_id: param.tableId },
+        data: { records: chunkData },
+      })
+
+      if (res.code !== 0)
+        throw new Error(
+          `删除原始数据失败，错误信息: ${res.msg}, 错误码: ${res.code}, 请求参数: ${JSON.stringify(
+            param,
+          )}`,
+        )
+    }
+  }
+
+  /**
+   * 删除整个表数据
+   */
+  async deleteWholeTableData(objToken: string, tableId: string) {
+    const wholeTableData = await this.readTableData({
+      objToken,
+      tableId,
+    })
+    if (!wholeTableData.length) return
+
+    const recordIds = wholeTableData.map((record) => record.record_id)
+    await this.deleteOriginalData({
+      objToken,
+      tableId,
+      recordIds,
+    })
   }
 }
 

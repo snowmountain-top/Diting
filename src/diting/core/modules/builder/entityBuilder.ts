@@ -36,6 +36,7 @@ class EntityBuilder {
     taskRecordEntity.jsScript = task.jsScript
     taskRecordEntity.feishuMetaData = task.feishuMetaData
     taskRecordEntity.cronExpression = task.cronExpression
+    taskRecordEntity.config = task.config
     taskRecordEntity.runMode = task.runMode
     taskRecordEntity.errorLog = ''
     return taskRecordEntity

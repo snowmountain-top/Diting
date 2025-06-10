@@ -29,6 +29,14 @@ class ExecutionService {
     const originData = await this.fetchRemoteData(taskRecord)
     // 执行JavaScript脚本处理数据
     const processedData = await this.executeJsScript(taskRecord, originData)
+    // 推数前操作
+    if (taskRecord.config.deleteWholeFeishuTableDataBeforeRun) {
+      // 删除飞书表格所有数据
+      await feishuClient.deleteWholeTableData(
+        taskRecord.feishuMetaData.objToken,
+        taskRecord.feishuMetaData.tableId,
+      )
+    }
     // 插入飞书表格
     const feishuMetaData = taskRecord.feishuMetaData
     await feishuClient.insertRecords(feishuMetaData.objToken, feishuMetaData.tableId, processedData)
