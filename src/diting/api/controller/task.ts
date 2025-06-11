@@ -41,6 +41,7 @@ class TaskController implements DitingTypes.ITaskController {
         tableId: feishuMetaData.tableId,
         objToken: feishuMetaData.objToken,
       },
+      config: request.config,
       creatorName: request.creatorName,
       updaterName: request.updaterName,
     })
