@@ -17,6 +17,7 @@ class EntityBuilder {
     taskEntity.sql = params.sql
     taskEntity.jsScript = params.jsScript
     taskEntity.feishuMetaData = params.feishuMetaData
+    taskEntity.config = params.config
     taskEntity.creatorName = params.creatorName
     taskEntity.updaterName = params.updaterName
     return taskEntity

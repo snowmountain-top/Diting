@@ -7,15 +7,17 @@ x-wx-unionid: "ttt"
 x-wx-appid: "appid"
 
 {
-  "name": "testTask",
-  "sql": "select * from PositiveOrder where id = '683e9c39d65e389524169bf247';",
-  "cronExpression": "",
-  "jsScript": "return data",
+  "feishuTableUrl": "https://8848-top.feishu.cn/wiki/FZb7wjIx7i2UqTkCPmYcKeh1nrd?table=tblNhcDDSCNYOoxe&view=vewxA9jNee",
+  "name": "睦辰测试",
+  "sql": "select\n  PO.id as orderId,\n  PO.createdAt as createdAt,\n  PO.actuallyPaidFee,\n  TOSI.remainQuantity,\n  TOII.itemName,\n  JSON_UNQUOTE(POVI.venueInfo -> '$.name') as storeName\nfrom PositiveOrder PO\ninner join TradeOrderSkuInfo TOSI on PO.id = TOSI.tradeOrderId and PO.fulfillAt = TOSI.departureDate\ninner join TradeOrderItemInfo TOII on PO.id = TOII.tradeOrderId\ninner join PositiveOrderVenueInfo POVI on PO.id = POVI.orderId\nwhere TOSI.status = 'VALID'\nand PO.createdAt > 1746777251890\nand PO.categoryTwo = 'PARTY_TOUR'\n;",
+  "jsScript": "return data.map((item) => {\n    return {\n        \"订单ID\": item.orderId,\n        \"订单创建时间\": item.createdAt,\n        \"订单实付金额\": Number((item.actuallyPaidFee / 100).toFixed(2)),\n        \"订单购买份数\": item.remainQuantity,\n        \"商品名称\": item.itemName,\n        \"门店名称\": item.storeName\n    }\n})",
+  "cronExpression": "0 0 * * * *",
   "runMode": "MANUAL",
-  "creatorName": "testUser",
-  "updaterName": "testUser",
-  "feishuTableUrl": "https://8848-top.feishu.cn/wiki/ZkPUw9h4OilgUXkjk5lcqL3WnAc?fromScene=spaceOverview&table=tblUtnoGFJOIraIK&view=vewDpHgpmM"
+  "config": { "deleteWholeFeishuTableDataBeforeRun": true },
+  "creatorName": "睦辰",
+  "updaterName": "睦辰"
 }
+
 
 ###
 POST {{baseUrl}}/update HTTP/1.1
