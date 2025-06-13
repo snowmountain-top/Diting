@@ -33,14 +33,14 @@ class ScheduleService {
         const taskFromDB = await taskService.get(task.id)
         if (taskFromDB.status !== TaskStatus.ACTIVE) {
           logger.warn(`任务[${task.id}]状态不合法: ${task.status}`)
-          this.cleanJob(task.id)
+          this.stopJob(task.id)
           return
         }
         const taskRecord = await taskRecordService.initialFromTask(taskFromDB)
         await this.executeJob(taskRecord)
         // 手动运行的任务需要清理数据
         if (taskFromDB.runMode === TaskRunMode.MANUAL) {
-          this.cleanJob(taskFromDB.id)
+          this.stopJob(taskFromDB.id)
         }
       },
       async () => {
@@ -60,11 +60,12 @@ class ScheduleService {
     this.jobs[taskId] = job
   }
 
-  private cleanJob(taskId: string) {
-    if (taskId in this.jobs) {
-      this.jobs[taskId].stop()
-      delete this.jobs[taskId]
+  async stopJob(taskId: string) {
+    if (!(taskId in this.jobs)) {
+      return
     }
+    await this.jobs[taskId].stop()
+    delete this.jobs[taskId]
   }
 
   private getTaskExecutionDurationSec(taskRecord: TaskRecordEntity) {
@@ -92,6 +93,12 @@ class ScheduleService {
         durationSec: this.getTaskExecutionDurationSec(taskRecord),
       })
     }
+  }
+
+  async restartJob(taskId: string) {
+    const task = await taskService.get(taskId)
+    await this.stopJob(taskId)
+    await this.startJob(task)
   }
 }
 

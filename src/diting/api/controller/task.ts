@@ -90,7 +90,16 @@ class TaskController implements DitingTypes.ITaskController {
         objToken: feishuMetaData.objToken,
       }
     }
+    const originalTask = await taskService.get(request.id)
     await taskService.update(request.id, updateAttrs)
+
+    // 如果cron表达式有变更，需要重启任务
+    if (
+      request.attributes.cronExpression &&
+      request.attributes.cronExpression !== originalTask.cronExpression
+    ) {
+      scheduleService.restartJob(request.id)
+    }
   }
 
   @ZodFunctionValidate({
@@ -106,6 +115,11 @@ class TaskController implements DitingTypes.ITaskController {
       updaterName: request.operatorName,
     }
     await taskService.update(request.id, attributes)
+    if (request.status === TaskStatus.ACTIVE) {
+      scheduleService.restartJob(request.id)
+    } else {
+      scheduleService.stopJob(request.id)
+    }
   }
 
   @ZodFunctionValidate({
