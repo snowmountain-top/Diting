@@ -203,7 +203,7 @@ export class FeishuArchiveTool {
 
     // 过滤掉不需要归档的字段
     const archiveFields = fields.filter((field) => !this.excludeFieldsType.includes(field.type))
-    const timeStr = format(Date.now(), 'yyyy-MM-dd HH:mm')
+    const timeStr = format(Date.now(), 'yyyy-MM-dd_HH:mm')
     const tableName = `${this.config.prefixName}_${timeStr}`
     const viewName = '默认视图'
     const fieldMap = fromPairs(archiveFields.map((field) => [field.field_name, field.type]))
