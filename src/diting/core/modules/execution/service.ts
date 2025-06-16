@@ -1,8 +1,12 @@
+import * as moneyUtils from '@be-link/common-sdk/utils/money'
+import * as fns from 'date-fns'
+import _ from 'lodash'
 import vm from 'vm'
-import TaskRecordEntity from '../../entity/TaskRecord'
-import belinkRepository from '../../repository/database/belink'
+import { FeishuArchiveTool } from '../../../utils/feishuArchiveTool'
 import getLogger from '../../../utils/logger'
 import feishuClient from '../../../vendors/feishuClient'
+import TaskRecordEntity from '../../entity/TaskRecord'
+import belinkRepository from '../../repository/database/belink'
 
 const logger = getLogger()
 
@@ -17,10 +21,34 @@ class ExecutionService {
     const wrappedScript = `(function() { ${taskRecord.jsScript} })()`
     const jsScript = new vm.Script(wrappedScript)
     try {
-      return jsScript.runInNewContext({ data, logger }, { timeout: 5000 })
+      return jsScript.runInNewContext({ data, moneyUtils, fns, _ }, { timeout: 5000 })
     } catch (error) {
       logger.error('执行js脚本失败', error)
       throw error
+    }
+  }
+
+  async doPrepareActions(taskRecord: TaskRecordEntity) {
+    // 推数前删除飞书表格所有数据
+    if (taskRecord.config.deleteWholeFeishuTableDataBeforeRun) {
+      await feishuClient.deleteWholeTableData(
+        taskRecord.feishuMetaData.objToken,
+        taskRecord.feishuMetaData.tableId,
+      )
+      logger.info(
+        `[${taskRecord.id}]已成功删除飞书表格[${taskRecord.feishuMetaData.tableId}]所有数据`,
+      )
+    }
+    // 自动归档
+    if (taskRecord.config.autoArchiveFeishuTable) {
+      const archiveTool = new FeishuArchiveTool({
+        tableId: taskRecord.feishuMetaData.tableId,
+        objectToken: taskRecord.feishuMetaData.objToken,
+        maxRecordCount: taskRecord.config.archiveFeishuTableConfig.maxRowCount,
+        prefixName: taskRecord.config.archiveFeishuTableConfig.prefixName,
+      })
+      await archiveTool.archive()
+      logger.info(`[${taskRecord.id}]已成功归档飞书表格[${taskRecord.feishuMetaData.tableId}]数据`)
     }
   }
 
@@ -32,16 +60,7 @@ class ExecutionService {
     const processedData = await this.executeJsScript(taskRecord, originData)
     logger.info(`[${taskRecord.id}]已成功处理 ${processedData.length} 条数据`)
     // 推数前操作
-    if (taskRecord.config.deleteWholeFeishuTableDataBeforeRun) {
-      // 删除飞书表格所有数据
-      await feishuClient.deleteWholeTableData(
-        taskRecord.feishuMetaData.objToken,
-        taskRecord.feishuMetaData.tableId,
-      )
-      logger.info(
-        `[${taskRecord.id}]已成功删除飞书表格[${taskRecord.feishuMetaData.tableId}]所有数据`,
-      )
-    }
+    await this.doPrepareActions(taskRecord)
     // 插入飞书表格
     const feishuMetaData = taskRecord.feishuMetaData
     await feishuClient.insertRecords(feishuMetaData.objToken, feishuMetaData.tableId, processedData)

@@ -38,7 +38,12 @@
   "runMode": "运行方式",
   "feishuTableUrl": "飞书表格URL",
   "config": {
-    "deleteWholeFeishuTableDataBeforeRun": false
+    "deleteWholeFeishuTableDataBeforeRun": false,
+    "autoArchiveFeishuTable": true,
+    "archiveFeishuTableConfig": {
+      "maxRowCount": 1000,
+      "prefixName": "归档"
+    }
   },
   "creatorName": "创建者",
   "updaterName": "更新者"
@@ -76,7 +81,12 @@
     "cronExpression": "CRON表达式",
     "feishuTableUrl": "飞书表格URL",
     "config": {
-      "deleteWholeFeishuTableDataBeforeRun": false
+      "deleteWholeFeishuTableDataBeforeRun": false,
+      "autoArchiveFeishuTable": true,
+      "archiveFeishuTableConfig": {
+        "maxRowCount": 1000,
+        "prefixName": "归档"
+      }
     }
   }
 }
