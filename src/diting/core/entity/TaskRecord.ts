@@ -79,10 +79,7 @@ export default class TaskRecordEntity extends BasicEntity {
     comment: '配置',
     nullable: false,
   })
-  config: {
-    /** 是否在运行前删除整表数据 */
-    deleteWholeFeishuTableDataBeforeRun: boolean
-  }
+  config: DitingTypes.Dto.TaskRecordDto['config']
 
   @Column({
     type: 'text',

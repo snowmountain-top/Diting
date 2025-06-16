@@ -21,6 +21,13 @@ class TaskController implements DitingTypes.ITaskController {
       feishuTableUrl: z.string(),
       config: z.object({
         deleteWholeFeishuTableDataBeforeRun: z.boolean(),
+        autoArchiveFeishuTable: z.boolean(),
+        archiveFeishuTableConfig: z
+          .object({
+            prefixName: z.string(),
+            maxRowCount: z.number(),
+          })
+          .optional(),
       }),
       creatorName: z.string(),
       updaterName: z.string(),
@@ -70,6 +77,13 @@ class TaskController implements DitingTypes.ITaskController {
           config: z
             .object({
               deleteWholeFeishuTableDataBeforeRun: z.boolean().optional(),
+              autoArchiveFeishuTable: z.boolean().optional(),
+              archiveFeishuTableConfig: z
+                .object({
+                  prefixName: z.string().optional(),
+                  maxRowCount: z.number().optional(),
+                })
+                .optional(),
             })
             .optional(),
         })

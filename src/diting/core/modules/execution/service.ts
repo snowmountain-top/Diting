@@ -3,6 +3,7 @@ import TaskRecordEntity from '../../entity/TaskRecord'
 import belinkRepository from '../../repository/database/belink'
 import getLogger from '../../../utils/logger'
 import feishuClient from '../../../vendors/feishuClient'
+import { FeishuArchiveTool } from '../../../utils/feishuArchiveTool'
 
 const logger = getLogger()
 
@@ -24,16 +25,9 @@ class ExecutionService {
     }
   }
 
-  async run(taskRecord: TaskRecordEntity) {
-    // 执行SQL语句查询源数据
-    const originData = await this.fetchRemoteData(taskRecord)
-    logger.info(`[${taskRecord.id}]已成功查询到 ${originData.length} 条源数据`)
-    // 执行JavaScript脚本处理数据
-    const processedData = await this.executeJsScript(taskRecord, originData)
-    logger.info(`[${taskRecord.id}]已成功处理 ${processedData.length} 条数据`)
-    // 推数前操作
+  async doPrepareActions(taskRecord: TaskRecordEntity) {
+    // 推数前删除飞书表格所有数据
     if (taskRecord.config.deleteWholeFeishuTableDataBeforeRun) {
-      // 删除飞书表格所有数据
       await feishuClient.deleteWholeTableData(
         taskRecord.feishuMetaData.objToken,
         taskRecord.feishuMetaData.tableId,
@@ -42,6 +36,28 @@ class ExecutionService {
         `[${taskRecord.id}]已成功删除飞书表格[${taskRecord.feishuMetaData.tableId}]所有数据`,
       )
     }
+    // 自动归档
+    if (taskRecord.config.autoArchiveFeishuTable) {
+      const archiveTool = new FeishuArchiveTool({
+        tableId: taskRecord.feishuMetaData.tableId,
+        objectToken: taskRecord.feishuMetaData.objToken,
+        maxRecordCount: taskRecord.config.archiveFeishuTableConfig.maxRowCount,
+        prefixName: taskRecord.config.archiveFeishuTableConfig.prefixName,
+      })
+      await archiveTool.archive()
+      logger.info(`[${taskRecord.id}]已成功归档飞书表格[${taskRecord.feishuMetaData.tableId}]数据`)
+    }
+  }
+
+  async run(taskRecord: TaskRecordEntity) {
+    // 执行SQL语句查询源数据
+    const originData = await this.fetchRemoteData(taskRecord)
+    logger.info(`[${taskRecord.id}]已成功查询到 ${originData.length} 条源数据`)
+    // 执行JavaScript脚本处理数据
+    const processedData = await this.executeJsScript(taskRecord, originData)
+    logger.info(`[${taskRecord.id}]已成功处理 ${processedData.length} 条数据`)
+    // 推数前操作
+    await this.doPrepareActions(taskRecord)
     // 插入飞书表格
     const feishuMetaData = taskRecord.feishuMetaData
     await feishuClient.insertRecords(feishuMetaData.objToken, feishuMetaData.tableId, processedData)

@@ -31,6 +31,15 @@ export namespace DitingTypes {
       config: {
         /** 是否在运行前删除整表数据 */
         deleteWholeFeishuTableDataBeforeRun: boolean
+        /** 是否自动归档 */
+        autoArchiveFeishuTable: boolean
+        /** 归档配置 */
+        archiveFeishuTableConfig?: {
+          /** 归档新表的名称前缀 */
+          prefixName: string
+          /** 满足多少行时进行归档 */
+          maxRowCount: number
+        }
       }
       /** 创建时间 */
       createdAt: number
@@ -89,10 +98,7 @@ export namespace DitingTypes {
       /** 飞书表元数据 */
       feishuTableUrl: string
       /** 任务设置项 */
-      config: {
-        /** 是否在运行前删除整表数据 */
-        deleteWholeFeishuTableDataBeforeRun: boolean
-      }
+      config: Dto.TaskDto['config']
       /** 创建者 */
       creatorName: string
       /** 更新者 */
