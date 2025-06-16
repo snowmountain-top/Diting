@@ -132,17 +132,6 @@ export class FeishuArchiveTool {
     }
   }
 
-  /**
-   * 删除整个表数据
-   */
-  async deleteWholeTableData() {
-    const wholeTableData = await this.readTableData()
-    if (!wholeTableData.length) return
-
-    const recordIds = wholeTableData.map((record) => record.record_id)
-    await this.deleteOriginalData(recordIds)
-  }
-
   /** 获取总数 */
   async getTotalCount() {
     const res = await this.client.bitable.v1.appTableRecord.list({
