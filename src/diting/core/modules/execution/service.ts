@@ -1,9 +1,12 @@
+import * as moneyUtils from '@be-link/common-sdk/utils/money'
+import * as fns from 'date-fns'
+import _ from 'lodash'
 import vm from 'vm'
-import TaskRecordEntity from '../../entity/TaskRecord'
-import belinkRepository from '../../repository/database/belink'
+import { FeishuArchiveTool } from '../../../utils/feishuArchiveTool'
 import getLogger from '../../../utils/logger'
 import feishuClient from '../../../vendors/feishuClient'
-import { FeishuArchiveTool } from '../../../utils/feishuArchiveTool'
+import TaskRecordEntity from '../../entity/TaskRecord'
+import belinkRepository from '../../repository/database/belink'
 
 const logger = getLogger()
 
@@ -18,7 +21,7 @@ class ExecutionService {
     const wrappedScript = `(function() { ${taskRecord.jsScript} })()`
     const jsScript = new vm.Script(wrappedScript)
     try {
-      return jsScript.runInNewContext({ data, logger }, { timeout: 5000 })
+      return jsScript.runInNewContext({ data, moneyUtils, fns, _ }, { timeout: 5000 })
     } catch (error) {
       logger.error('执行js脚本失败', error)
       throw error
