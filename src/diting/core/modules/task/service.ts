@@ -33,10 +33,16 @@ class TaskService {
     if (attributes.cronExpression && attributes.cronExpression !== originalTask.cronExpression) {
       // 如果cron表达式有变更，需要重启任务
       await scheduleService.restartJob(taskId)
-    } else if (attributes.runMode === TaskRunMode.CRON) {
+    } else if (
+      originalTask.runMode === TaskRunMode.MANUAL &&
+      attributes.runMode === TaskRunMode.CRON
+    ) {
       // 手动模式变更为定时模式，需要重启任务
       await scheduleService.restartJob(taskId)
-    } else if (attributes.runMode === TaskRunMode.MANUAL) {
+    } else if (
+      originalTask.runMode === TaskRunMode.CRON &&
+      attributes.runMode === TaskRunMode.MANUAL
+    ) {
       // 定时模式变更为手动模式，需要停止任务
       await scheduleService.stopJob(taskId)
     }
