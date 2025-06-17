@@ -1,10 +1,11 @@
 import { keyBy } from 'lodash'
 import taskRepository from '../../repository/database/task'
 import TaskEntity from '../../entity/Task'
-import { TaskStatus } from '../../../enum'
+import { TaskRunMode, TaskStatus } from '../../../enum'
 import EntityBuilder from '../builder/entityBuilder'
 import difyClient from '../../../vendors/dify'
 import feishuClient from '../../../vendors/feishuClient'
+import scheduleService from '../schedule/service'
 
 class TaskService {
   async get(taskId: string) {
@@ -24,8 +25,28 @@ class TaskService {
   }
 
   async update(taskId: string, attributes: Partial<TaskEntity>) {
+    const originalTask = await this.get(taskId)
     attributes.updatedAt = Date.now()
     const updatedTask = await taskRepository.update(taskId, attributes)
+
+    // 任务更新后的调度处理逻辑
+    if (attributes.cronExpression && attributes.cronExpression !== originalTask.cronExpression) {
+      // 如果cron表达式有变更，需要重启任务
+      scheduleService.restartJob(taskId)
+    } else if (
+      originalTask.runMode === TaskRunMode.MANUAL &&
+      attributes.runMode === TaskRunMode.CRON
+    ) {
+      // 手动模式变更为定时模式，需要重启任务
+      scheduleService.restartJob(taskId)
+    } else if (
+      originalTask.runMode === TaskRunMode.CRON &&
+      attributes.runMode === TaskRunMode.MANUAL
+    ) {
+      // 定时模式变更为手动模式，需要停止任务
+      scheduleService.stopJob(taskId)
+    }
+
     return updatedTask
   }
 
