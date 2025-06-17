@@ -108,7 +108,7 @@ export namespace DitingTypes {
     export type ITaskUpdateRequest = {
       id: string
       operatorName: string
-      attributes: Partial<Omit<ITaskCreateRequest, ['creatorName', 'updaterName', 'runMode']>>
+      attributes: Partial<Omit<ITaskCreateRequest, ['creatorName', 'updaterName']>>
     }
 
     export type ITaskChangeStatusRequest = {

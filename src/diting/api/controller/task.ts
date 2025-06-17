@@ -69,6 +69,7 @@ class TaskController implements DitingTypes.ITaskController {
           name: z.string().optional(),
           sql: z.string().optional(),
           jsScript: z.string().optional(),
+          runMode: z.nativeEnum(TaskRunMode).optional(),
           cronExpression: z
             .string()
             .refine((val) => isCronExp(val), { message: 'CRON 表达式格式无效，示例: 0 0 * * * *' })
