@@ -43,9 +43,7 @@ class ScheduleService {
           this.stopJob(taskFromDB.id)
         }
       },
-      async () => {
-        console.info('任务执行完成')
-      },
+      async () => {},
     )
     job.start()
     this.addJob(task.id, job)
@@ -87,6 +85,7 @@ class ScheduleService {
     } catch (error) {
       logger.error('任务执行失败', error)
       const errorLog = error instanceof BizError ? error.message : error.stack
+      logger.info(`任务执行失败 --- taskRecordId: ${taskRecord.id}`)
       await taskRecordService.update(taskRecord.id, {
         status: TaskRecordStatus.FAILED,
         errorLog,
