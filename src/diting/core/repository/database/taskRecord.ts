@@ -1,6 +1,9 @@
 import { In } from 'typeorm'
 import { getDataSource } from '../../connection/database'
 import TaskRecordEntity from '../../entity/TaskRecord'
+import getLogger from '../../../utils/logger'
+
+const logger = getLogger()
 
 class TaskRecordRepository {
   async create(taskRecord: TaskRecordEntity) {
@@ -8,9 +11,30 @@ class TaskRecordRepository {
     return dataSource.getRepository(TaskRecordEntity).insert(taskRecord)
   }
 
-  async update(taskRecordId: string, attributes: Partial<TaskRecordEntity>) {
+  async save(taskRecord: TaskRecordEntity) {
     const dataSource = await getDataSource()
-    return dataSource.getRepository(TaskRecordEntity).update(taskRecordId, attributes)
+    return dataSource.getRepository(TaskRecordEntity).save(taskRecord)
+  }
+
+  async update(taskRecordId: string, attributes: Partial<TaskRecordEntity>) {
+    logger.info(
+      `TaskRecord Repository: 更新任务记录[${taskRecordId}], 更新内容: ${JSON.stringify(
+        attributes,
+      )}`,
+    )
+    const dataSource = await getDataSource()
+    return dataSource
+      .getRepository(TaskRecordEntity)
+      .createQueryBuilder()
+      .update()
+      .set({
+        updatedAt: Date.now(),
+        ...attributes,
+      })
+      .where({
+        id: taskRecordId,
+      })
+      .execute()
   }
 
   async get(taskRecordId: string) {
