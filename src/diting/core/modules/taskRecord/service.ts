@@ -1,7 +1,10 @@
+import getLogger from '../../../utils/logger'
 import TaskEntity from '../../entity/Task'
 import TaskRecordEntity from '../../entity/TaskRecord'
 import taskRecordRepository from '../../repository/database/taskRecord'
 import EntityBuilder from '../builder/entityBuilder'
+
+const logger = getLogger()
 
 class TaskRecordService {
   async initialFromTask(task: TaskEntity) {
@@ -10,8 +13,9 @@ class TaskRecordService {
     return taskRecord
   }
 
-  async update(id: string, attributes: Partial<TaskRecordEntity>) {
-    await taskRecordRepository.update(id, attributes)
+  async update(taskRecordId: string, attributes: Partial<TaskRecordEntity>) {
+    logger.info(`更新任务记录[${taskRecordId}], 更新内容: ${JSON.stringify(attributes)}`)
+    return taskRecordRepository.update(taskRecordId, attributes)
   }
 
   async queryByTaskId(param: { taskId?: string; pageIndex: number; pageSize: number }) {
