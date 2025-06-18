@@ -1,3 +1,4 @@
+import EntityUtils from '../../../utils/entityUtils'
 import getLogger from '../../../utils/logger'
 import TaskEntity from '../../entity/Task'
 import TaskRecordEntity from '../../entity/TaskRecord'
@@ -15,7 +16,9 @@ class TaskRecordService {
 
   async update(taskRecordId: string, attributes: Partial<TaskRecordEntity>) {
     logger.info(`更新任务记录[${taskRecordId}], 更新内容: ${JSON.stringify(attributes)}`)
-    return taskRecordRepository.update(taskRecordId, attributes)
+    let taskRecord = await taskRecordRepository.get(taskRecordId)
+    taskRecord = EntityUtils.mergeAttributes(taskRecord, attributes)
+    return taskRecordRepository.save(taskRecord)
   }
 
   async queryByTaskId(param: { taskId?: string; pageIndex: number; pageSize: number }) {
