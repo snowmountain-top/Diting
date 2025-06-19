@@ -300,6 +300,31 @@ Authorization: Bearer {token}
 }
 ```
 
+### 9. 删除任务
+
+- **URL**: `/task/delete`
+- **方法**: POST
+- **描述**: 删除指定任务
+- **请求参数**:
+
+```json
+{
+  "taskId": "任务ID",
+  "operatorName": "操作者"
+}
+```
+
+- **响应**:
+
+```json
+{
+  "data": null,
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
+}
+```
+
 ## 任务记录接口
 
 ### 1. 根据任务查询记录
