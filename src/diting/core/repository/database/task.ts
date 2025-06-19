@@ -47,11 +47,15 @@ class TaskRepository {
     pageIndex: number
     pageSize: number
     sort: {
-      createdAt: 'DESC' | 'ASC'
+      // 按创建时间
+      createdAt?: 'DESC' | 'ASC'
+      // 按任务名称
+      name?: 'DESC' | 'ASC'
     }
   }) {
     const dataSource = await getDataSource()
     const queryBuilder = dataSource.getRepository(TaskEntity).createQueryBuilder('task')
+    queryBuilder.where('task.deletedAt = 0')
     if (!isEmpty(param.status)) {
       queryBuilder.andWhere('task.status IN (:...status)', { status: param.status })
     }
@@ -63,7 +67,9 @@ class TaskRepository {
     queryBuilder.offset(param.pageIndex * param.pageSize)
     queryBuilder.limit(param.pageSize)
     for (const [key, value] of Object.entries(param.sort)) {
-      queryBuilder.addOrderBy(`task.${key}`, value)
+      if (value) {
+        queryBuilder.addOrderBy(`task.${key}`, value)
+      }
     }
     const [data, total] = await queryBuilder.getManyAndCount()
     return { data, total }

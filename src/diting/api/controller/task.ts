@@ -138,7 +138,10 @@ class TaskController implements DitingTypes.ITaskController {
         .refine((val) => val > 0 && val <= 100, { message: 'pageSize 必须大于 0 且小于等于 100' }),
       sort: z
         .object({
+          // 按创建时间
           createdAt: z.enum(['DESC', 'ASC']).optional(),
+          // 按任务名称
+          name: z.enum(['DESC', 'ASC']).optional(),
         })
         .optional(),
     }),
@@ -203,6 +206,16 @@ class TaskController implements DitingTypes.ITaskController {
       throw new BizError('任务不存在')
     }
     return task.dto()
+  }
+
+  @ZodFunctionValidate({
+    request: z.object({
+      taskId: z.string(),
+      operatorName: z.string(),
+    }),
+  })
+  delete(request: DitingTypes.Request.ITaskDeleteRequest): Promise<void> {
+    return taskService.remove(request.taskId)
   }
 }
 
