@@ -6,6 +6,7 @@ import EntityBuilder from '../builder/entityBuilder'
 import difyClient from '../../../vendors/dify'
 import feishuClient from '../../../vendors/feishuClient'
 import scheduleService from '../schedule/service'
+import BizError from '../../../errors/BizError'
 
 class TaskService {
   async get(taskId: string) {
@@ -51,7 +52,11 @@ class TaskService {
   }
 
   async remove(taskId: string) {
-    return taskRepository.remove(taskId)
+    if (!taskId) {
+      throw new BizError('任务ID不能为空')
+    }
+    await taskRepository.remove(taskId)
+    scheduleService.stopJob(taskId)
   }
 
   async query(param: {
@@ -60,7 +65,10 @@ class TaskService {
     pageIndex: number
     pageSize: number
     sort?: {
+      // 按创建时间
       createdAt?: 'DESC' | 'ASC'
+      // 按任务名称
+      name?: 'DESC' | 'ASC'
     }
   }) {
     const { data, total } = await taskRepository.query({
@@ -69,7 +77,8 @@ class TaskService {
       pageIndex: param.pageIndex,
       pageSize: param.pageSize,
       sort: {
-        createdAt: param.sort?.createdAt || 'DESC',
+        createdAt: param.sort?.createdAt,
+        name: param.sort?.name,
       },
     })
     return {

@@ -2,8 +2,8 @@
 
 ## 基础域名
 
-- 测试环境: `https://diting-dev.api.8848top.cn`
-- 生产环境: `https://diting.api.8848top.cn`
+- 测试环境: `https://diting-api-dev.8848top.cn`
+- 生产环境: `https://diting-api.8848top.cn`
 
 ## 基本信息
 
@@ -18,6 +18,14 @@
   "success": true,
   "requestId": "请求ID"
 }
+```
+
+## 认证
+
+所有接口都需要通过JWT认证，请在请求头中添加以下字段：
+
+```
+Authorization: Bearer {token}
 ```
 
 ## 任务管理接口
@@ -92,7 +100,16 @@
 }
 ```
 
-- **响应**: 无返回数据
+- **响应**:
+
+```json
+{
+  "data": null,
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
+}
+```
 
 ### 3. 获取任务详情
 
@@ -127,7 +144,12 @@
       "objToken": "对象Token"
     },
     "config": {
-      "deleteWholeFeishuTableDataBeforeRun": false
+      "deleteWholeFeishuTableDataBeforeRun": false,
+      "autoArchiveFeishuTable": true,
+      "archiveFeishuTableConfig": {
+        "maxRowCount": 1000,
+        "prefixName": "归档"
+      }
     },
     "createdAt": 创建时间,
     "updatedAt": 更新时间,
@@ -154,7 +176,16 @@
 }
 ```
 
-- **响应**: 无返回数据
+- **响应**:
+
+```json
+{
+  "data": null,
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
+}
+```
 
 ### 5. 查询任务列表
 
@@ -170,7 +201,8 @@
   "pageIndex": 页码,
   "pageSize": 每页大小,
   "sort": {
-    "createdAt": "DESC或ASC（可选）"
+    "createdAt": "DESC或ASC（可选）",
+    "name": "DESC或ASC（可选）"
   }
 }
 ```
@@ -203,7 +235,16 @@
 }
 ```
 
-- **响应**: 无返回数据
+- **响应**:
+
+```json
+{
+  "data": null,
+  "message": "success",
+  "success": true,
+  "requestId": "请求ID"
+}
+```
 
 ### 7. AI推导CRON表达式
 
@@ -294,7 +335,12 @@
         "objToken": "对象Token"
       },
       "config": {
-        "deleteWholeFeishuTableDataBeforeRun": false
+        "deleteWholeFeishuTableDataBeforeRun": false,
+        "autoArchiveFeishuTable": true,
+        "archiveFeishuTableConfig": {
+          "maxRowCount": 1000,
+          "prefixName": "归档"
+        }
       },
       "cronExpression": "CRON表达式",
       "runMode": "运行方式",
@@ -330,14 +376,6 @@
 - `SUCCESS`: 任务成功
 - `FAILED`: 任务失败
 - `WAITING`: 等待中
-
-## 认证说明
-
-所有接口都需要通过JWT认证，请在请求头中添加以下字段：
-
-```
-Authorization: Bearer {token}
-```
 
 ## 错误处理
 

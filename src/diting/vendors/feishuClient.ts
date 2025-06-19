@@ -2,7 +2,7 @@ import * as lark from '@larksuiteoapi/node-sdk'
 import { getRemoteConfig } from '../settings'
 import BizError from '../errors/BizError'
 import getLogger from '../utils/logger'
-import { chunk } from 'lodash'
+import { chunk, isEmpty } from 'lodash'
 
 const logger = getLogger()
 
@@ -67,7 +67,9 @@ class FeishuClient {
     })
 
     const fields: { field_name: string; field_id: string }[] = []
-    for await (const res of iterator)
+    for await (const res of iterator) {
+      if (isEmpty(res.items)) continue
+
       fields.push(
         ...res.items.map((item) => {
           return {
@@ -77,6 +79,7 @@ class FeishuClient {
           }
         }),
       )
+    }
 
     return fields
   }

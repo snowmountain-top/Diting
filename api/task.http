@@ -51,7 +51,10 @@ x-wx-appid: "appid"
 {
   "name": "",
   "pageIndex": 0,
-  "pageSize": 100
+  "pageSize": 100,
+  "sort": {
+    "name": "DESC"
+  }
 }
 
 ###
@@ -86,4 +89,16 @@ x-wx-appid: "appid"
 {
   "taskId": "684935f0b432221710fde50a",
   "executorName": "MC"
+}
+
+###
+POST {{baseUrl}}/delete HTTP/1.1
+Content-Type: application/json
+x-wx-openid: "test"
+x-wx-unionid: "ttt"
+x-wx-appid: "appid"
+
+{
+  "taskId": "6853c9b516a9d903cf652a21",
+  "operatorName": "MC"
 }
