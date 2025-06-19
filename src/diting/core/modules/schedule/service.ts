@@ -83,9 +83,8 @@ class ScheduleService {
         durationSec: this.getTaskExecutionDurationSec(taskRecord),
       })
     } catch (error) {
-      logger.error('任务执行失败', error)
+      logger.error(`任务[${taskRecord.taskId} | ${taskRecord.id}]执行失败`, error)
       const errorLog = error instanceof BizError ? error.message : error.stack
-      logger.info(`任务执行失败 --- taskRecordId: ${taskRecord.id}`)
       await taskRecordService.update(taskRecord.id, {
         status: TaskRecordStatus.FAILED,
         errorLog,

@@ -128,7 +128,10 @@ export namespace DitingTypes {
       pageSize: number
       /** 排序 */
       sort?: {
+        // 按创建时间
         createdAt?: 'DESC' | 'ASC'
+        // 按任务名称
+        name?: 'DESC' | 'ASC'
       }
     }
 
@@ -156,6 +159,11 @@ export namespace DitingTypes {
     export interface ITaskGetFeishuTableMetaDataRequest {
       /** 飞书表格url */
       url: string
+    }
+
+    export interface ITaskDeleteRequest {
+      taskId: string
+      operatorName: string
     }
   }
 
@@ -198,6 +206,8 @@ export namespace DitingTypes {
     create(request: Request.ITaskCreateRequest): Promise<Response.ITaskCreateResponse>
     /** 更新任务 */
     update(request: Request.ITaskUpdateRequest): Promise<void>
+    /** 软删除任务 */
+    delete(request: Request.ITaskDeleteRequest): Promise<void>
     /** 查询任务详情 */
     getDetail(request: { id: string }): Promise<Dto.TaskDto>
     /** 改变任务状态 */
