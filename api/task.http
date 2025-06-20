@@ -75,9 +75,7 @@ x-wx-openid: "test"
 x-wx-unionid: "ttt"
 x-wx-appid: "appid"
 
-{
-  "url": "https://8848-top.feishu.cn/wiki/ZkPUw9h4OilgUXkjk5lcqL3WnAc?table=tblUtnoGFJOIraIK&view=vewDpHgpmM"
-}
+{"url":"https://8848-top.feishu.cn/wiki/P5xLw36dBiNkbvk1uWOcCDuHnFb?table=tbl5tnfiGgsQymgQ&view=vewNxZIKyn"}
 
 ###
 POST {{baseUrl}}/manual-run HTTP/1.1

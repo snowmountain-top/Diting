@@ -43,7 +43,7 @@ class FeishuClient {
    * 查询飞书数据表列表
    */
   async queryAllTableData(objToken: string) {
-    const res = await this.getClient().bitable.v1.appTable.list({
+    const iterator = await this.getClient().bitable.v1.appTable.listWithIterator({
       path: {
         app_token: objToken,
       },
@@ -51,11 +51,11 @@ class FeishuClient {
         page_size: 100,
       },
     })
-    if (res.code !== 0) {
-      logger.error(`查询飞书数据表列表失败: ${JSON.stringify(res)}`)
-      throw new BizError('查询飞书表格列表失败')
+    const items = []
+    for await (const res of iterator) {
+      items.push(...res.items)
     }
-    return res.data.items
+    return items
   }
 
   /**
@@ -125,10 +125,10 @@ class FeishuClient {
       this.queryTableColumns(objToken, tableId),
     ])
     const tableInfo = tableList.find((item) => item.table_id === tableId)
-    const tableName = tableInfo.name
     if (!tableInfo) {
       throw new BizError('未匹配到指定的表格, 请检查链接是否正确')
     }
+    const tableName = tableInfo.name
     const columnNames = columnList.map((item) => item.field_name)
     return {
       tableId,
