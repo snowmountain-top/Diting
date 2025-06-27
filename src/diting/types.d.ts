@@ -1,4 +1,4 @@
-import { TaskStatus, TaskRecordStatus, TaskRunMode } from './enum'
+import { TaskStatus, TaskRecordStatus, TaskRunMode, TaskNodeType } from './enum'
 
 export namespace DitingTypes {
   export namespace Dto {
@@ -81,6 +81,88 @@ export namespace DitingTypes {
       /** 删除时间 */
       deletedAt: number
     }
+
+    export interface TaskV2Dto {
+      /** 任务ID */
+      id: string
+      /** 创建时间 */
+      createdAt: number
+      /** 更新时间 */
+      updatedAt: number
+      /** 删除时间 */
+      deletedAt: number
+      /** 任务名称 */
+      name: string
+      /** 任务状态 */
+      status: TaskStatus
+      /** CRON表达式 */
+      cronExpression: string
+      /** 节点关系列表 */
+      nodeRelations: {
+        /** 源节点ID */
+        source: string
+        /** 目标节点ID */
+        target: string
+      }[]
+      /** 创建者名称 */
+      creatorName: string
+      /** 更新者名称 */
+      updaterName: string
+    }
+
+    export interface TaskNode {}
+
+    /** 任务节点数据 */
+    export type TaskNodeConfig<T extends TaskNodeType> = T extends TaskNodeType.BEGIN_NODE
+      ? /** 开始节点信息 */
+        {}
+      : T extends TaskNodeType.END_NODE
+      ? /** 结束节点信息 */
+        {}
+      : T extends TaskNodeType.SQL_NODE
+      ? /** SQL节点信息 */
+        {
+          /** SQL语句 */
+          sql: string
+        }
+      : T extends TaskNodeType.JS_SCRIPT_NODE
+      ? /** JS代码节点信息 */
+        {
+          /** JavaScript脚本 */
+          jsScript: string
+        }
+      : T extends TaskNodeType.PUSH_FEISHU_TABLE_NODE
+      ? /** 推送飞书表格节点信息 */
+        {
+          url: string
+          tableId: string
+          objToken: string
+          config: {
+            /** 是否在运行前删除整表数据 */
+            deleteWholeFeishuTableDataBeforeRun: boolean
+            /** 是否自动归档 */
+            autoArchiveFeishuTable: boolean
+            /** 归档配置 */
+            archiveFeishuTableConfig?: {
+              /** 归档新表的名称前缀 */
+              prefixName: string
+              /** 满足多少行时进行归档 */
+              maxRowCount: number
+            }
+          }
+        }
+      : T extends TaskNodeType.PUSH_FEISHU_HOOK_NODE
+      ? /** 推送飞书通知节点信息 */
+        {
+          /** hook url */
+          url: string
+          /** js代码, 返回发送的通知内容 */
+          jsScript: string
+        }
+      : never
+
+    /** 任务记录V2版本的数据传输对象 */
+    export interface TaskRecordV2Dto {}
   }
 
   export namespace Request {

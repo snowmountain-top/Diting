@@ -31,3 +31,23 @@ export enum TaskRecordStatus {
   /** 等待中 */
   WAITING = 'WAITING',
 }
+
+/**
+ * 任务节点类型
+ */
+export enum TaskNodeType {
+  /** 开始节点 */
+  BEGIN_NODE = 'BEGIN_NODE',
+  /** 结束节点 */
+  END_NODE = 'END_NODE',
+  /** JS代码节点 */
+  JS_SCRIPT_NODE = 'JS_SCRIPT_NODE',
+  /** SQL代码节点 */
+  SQL_NODE = 'SQL_NODE',
+  /** 推送飞书表任务节点 */
+  PUSH_FEISHU_TABLE_NODE = 'PUSH_FEISHU_TABLE_NODE',
+  /** 推送飞书通知节点 */
+  PUSH_FEISHU_HOOK_NODE = 'PUSH_FEISHU_HOOK_NODE',
+  /** 接口调用 */
+  API_NODE = 'API_NODE',
+}
